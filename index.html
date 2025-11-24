@@ -171,8 +171,7 @@
                 <span>↻</span> Retocar
             </button>
         </div>
-        
-        <div id="currentTimeDisplay">0:00</div>
+        <div style="margin-top:15px;"> <input type="range" id="progressBar" value="0" min="0" step="1" style="width: 100%;"> </div> <div id="currentTimeDisplay">0:00</div>
     </div>
         </center>
 
@@ -187,8 +186,28 @@
         const stopButton = document.getElementById('stopButton');
         const restartButton = document.getElementById('restartButton');
         const timeDisplay = document.getElementById('currentTimeDisplay');
+        const progressBar = document.getElementById('progressBar'); // NOVO
 
-        // 2. Adicionar funcionalidade aos botões
+        // Atualizar barra e tempo quando o áudio carrega metadados
+        audioPlayer.addEventListener('loadedmetadata', function() {
+            progressBar.max = Math.floor(audioPlayer.duration);
+        });
+
+    // Quando a música está tocando, atualize barra e tempo
+        audioPlayer.addEventListener('timeupdate', function() {
+            progressBar.value = Math.floor(audioPlayer.currentTime);
+
+            const minutes = Math.floor(audioPlayer.currentTime / 60);
+            const seconds = Math.floor(audioPlayer.currentTime % 60);
+            const formattedTime = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            timeDisplay.textContent = formattedTime;
+        });
+
+        // Permitir que o usuário arraste a barra para mudar o tempo
+        progressBar.addEventListener('input', function() {
+            audioPlayer.currentTime = progressBar.value;
+        });
+
         playButton.addEventListener('click', function() {
             audioPlayer.play();
         });
@@ -202,14 +221,6 @@
             audioPlayer.play();
         });
 
-        // 3. Atualizar o mostrador de tempo em tempo real
-        audioPlayer.addEventListener('timeupdate', function() {
-            const currentTime = audioPlayer.currentTime;
-            const minutes = Math.floor(currentTime / 60);
-            const seconds = Math.floor(currentTime % 60);
-            const formattedTime = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-            timeDisplay.textContent = formattedTime;
-        });
     </script>
 </body>
 </html>
