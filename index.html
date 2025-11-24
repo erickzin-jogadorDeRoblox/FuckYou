@@ -1,64 +1,129 @@
-<html>
-  <head>
-    <title>Hollow soul <3</title>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <title>Hollow soul &lt;3</title>
     <link rel="icon" href="mitazinha.jpeg" type="image/jpeg">
     <style>
-      /* Default dark mode styles */
-      body {
-        background-color: #181818;
-        color: #e5e5e5;
-        font-family: Arial, sans-serif;
-      }
-    h1 {
-        color: white;
-      }
-      p {
-        color: white;
-      }
-      .toggle-btn {
-        margin: 18px;
-        padding: 10px 16px;
-        background: #333;
-        color: #e5e5e5;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 1em;
-        transition: background 0.2s;
-      }
-      .toggle-btn:hover {
-        background: #444;
-      }
+        /* CSS moderno para centralizar todo o conteúdo da página */
+        body {
+            background-color: #000000;
+            color: #FFFFFF; /* Mudado para branco para ser visível no fundo preto */
+            font-family: Arial, sans-serif;
+            /* Centraliza vertical e horizontalmente */
+            display: flex;
+            flex-direction: column; /* Organiza itens em coluna */
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        
+        h1 {
+            color: white;
+            text-align: center;
+        }
 
-      /* Light mode overrides */
-      body.light-mode {
-        background-color: #f9f9f9;
-        color: #222;
-      }
-      body.light-mode .toggle-btn {
-        background: #ddd;
-        color: #222;
-      }
-      body.light-mode h1 {
-        color: #c20000;
-        text-shadow: none;
-      }
+        p {
+            color: white;
+            text-align: center;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 15px auto; /* Adiciona margem em cima/embaixo e centraliza a imagem */
+        }
+
+        /* Estilo do container do player */
+        .player-container {
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+            background-color: white;
+            color: black; /* Texto interno do player em preto */
+            margin-top: 20px; /* Adiciona espaço entre a imagem e o player */
+        }
+
+        /* Estilo do botão */
+        #playPauseButton {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            margin-top: 10px;
+            border: none;
+        }
+
+        #playPauseButton:hover {
+            background-color: #0056b3;
+        }
+
+        /* Estilo do mostrador de tempo */
+        #currentTimeDisplay {
+            margin-top: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
     </style>
     <script>
       console.log("pq tu ta aqui, ta tentando derrubar o site, vou te mostrar o grosso... To brincando kkk... Afinal, a vida é só diversão, né?")
       console.log("me ajuda por favor, a vida minha é pessima...")
       console.log("só estou fazendo isso para passar o tempo, são 1 da manha e não consigo dormir, Te amo... :3")
     </script>
-  </head>
-  <body>
-    <audio autoplay muted loop>
-        <source src="mus_fallendown2.ogg" type="audio/ogg">
-        Seu navegador não suporta o elemento de áudio.
-    </audio>
-    <center>
-      <h1>Sinto o VAZIO na minha ALMA</h1>
-      <p>Eu to com depressão cara :( (é serio)</p>
-      <img src="mitazinha.jpeg" alt=":P">
-    </center>
-  </body>
+</head>
+<body>
+    
+    <!-- Conteúdo principal -->
+    <h1>Sinto o VAZIO na minha ALMA</h1>
+    <p>Eu to com depressão cara :( (é serio)</p>
+    <img src="mitazinha.jpeg" alt=":P">
+
+    <!-- Container do novo player interativo -->
+    <div class="player-container">
+        <h3>Tocar Música de Fundo</h3>
+        
+        <!-- Elemento de áudio invisível que controlamos via JS -->
+        <!-- Removi 'autoplay muted' daqui para dar controle total ao JS/Botão -->
+        <audio id="meuAudio">
+            <source src="mus_fallendown2.ogg" type="audio/ogg">
+            Seu navegador não suporta o elemento de áudio.
+        </audio>
+
+        <button id="playPauseButton">Tocar Áudio</button>
+        <div id="currentTimeDisplay">0:00</div>
+    </div>
+
+    <!-- Script JavaScript para funcionalidade do player -->
+    <script>
+        // 1. Obter referências aos elementos HTML
+        const audioPlayer = document.getElementById('meuAudio');
+        const playPauseButton = document.getElementById('playPauseButton');
+        const timeDisplay = document.getElementById('currentTimeDisplay');
+
+        // 2. Adicionar funcionalidade ao botão
+        playPauseButton.addEventListener('click', function() {
+            if (audioPlayer.paused) {
+                audioPlayer.play();
+                playPauseButton.textContent = 'Pausar Áudio';
+            } else {
+                audioPlayer.pause();
+                playPauseButton.textContent = 'Tocar Áudio';
+            }
+        });
+
+        // 3. Atualizar o mostrador de tempo em tempo real
+        audioPlayer.addEventListener('timeupdate', function() {
+            const currentTime = audioPlayer.currentTime;
+            const minutes = Math.floor(currentTime / 60);
+            const seconds = Math.floor(currentTime % 60);
+            const formattedTime = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            timeDisplay.textContent = formattedTime;
+        });
+    </script>
+
+</body>
 </html>
