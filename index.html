@@ -1,10 +1,61 @@
 <html>
   <head>
     <title>Fuck You!</title>
+    <style>
+      /* Default dark mode styles */
+      body {
+        background-color: #181818;
+        color: #e5e5e5;
+        font-family: Arial, sans-serif;
+      }
+      h1 {
+        color: #ff5555;
+        text-shadow: 2px 2px 8px #000;
+      }
+      .toggle-btn {
+        margin: 18px;
+        padding: 10px 16px;
+        background: #333;
+        color: #e5e5e5;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background 0.2s;
+      }
+      .toggle-btn:hover {
+        background: #444;
+      }
+
+      /* Light mode overrides */
+      body.light-mode {
+        background-color: #f9f9f9;
+        color: #222;
+      }
+      body.light-mode .toggle-btn {
+        background: #ddd;
+        color: #222;
+      }
+      body.light-mode h1 {
+        color: #c20000;
+        text-shadow: none;
+      }
+    </style>
   </head>
   <body>
+    <button class="toggle-btn" onclick="toggleTheme()">Toggle Dark/Light Mode</button>
     <h1>
       A SUA VIDA NÃO IMPORTA PARA MIM!
     </h1>
+    <script>
+      // Toggle dark/light mode
+      function toggleTheme() {
+        document.body.classList.toggle('light-mode');
+      }
+      // Optional: Match user's system preference on load
+      if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+        document.body.classList.add('light-mode');
+      }
+    </script>
   </body>
 </html>
