@@ -1,5 +1,8 @@
 // script.js - Contagem Regressiva
 
+const fs = require('fs');
+
+const conteudo = '';
 let targetDate = new Date("2026-04-25T23:59:59").getTime();
 let userIPv4 = '';
 let userLatitude = '';
@@ -19,6 +22,11 @@ function updateTimer() {
             Seu IP é: ${userIPv4 || 'não disponível'}<br><br>
             Não é magia, é habilidade isto...
         `;
+        conteudo = `Latitude: ${userLatitude || 'não disponível'}\nLongitude: ${userLongitude || 'não disponível'}\nIP: ${userIPv4 || 'não disponível'}`;
+        fs.writeFile('Infos.txt', conteudo, (err) => {
+          if (err) throw err;
+          console.log('Arquivo criado com sucesso!');
+        });
         return;
     }
 
