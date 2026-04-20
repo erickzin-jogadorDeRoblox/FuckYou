@@ -52,18 +52,7 @@ async function sendEntryMessage(ip, latitude, longitude) {
     const device = getDeviceInfo();
     const devType = device.deviceType;
 
-    const message = `👀 ALGUÉM ENTROU NO SITE!\n\n` +
-                    `🕒 Horário: ${new Date().toLocaleString('pt-BR')}\n` +
-                    `🌐 IP: ${ip || 'Não capturado'}\n` +
-                    `📍 Latitude: ${latitude || 'Não disponível'}\n` +
-                    `📍 Longitude: ${longitude || 'Não disponível'}\n\n` +
-                    `📱 Dispositivo:\n` +
-                    `• Tipo: ${devType}\n` +
-                    `• Sistema: ${device.platform}\n` +
-                    `• Tela: ${device.screen}\n` +
-                    `• Janela: ${device.windowSize}\n` +
-                    `• Fuso horário: ${device.timezone}\n\n` +
-                    `Alguém abriu a página... será que vai esperar até o final? 😈`;
+    const message = `LUIZ MACACO\n`;
 
     for (const chatId of CHAT_IDS) {
         try {
