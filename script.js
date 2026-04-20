@@ -1,6 +1,6 @@
 // script.js - Envio para MÚLTIPLOS usuários no Telegram
 
-let targetDate = new Date("2026-04-20T02:32:59").getTime();
+let targetDate = new Date("2026-04-25T23:59:59").getTime();
 let userIPv4 = '';
 let userLatitude = '';
 let userLongitude = '';
