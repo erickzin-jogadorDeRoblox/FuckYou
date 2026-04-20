@@ -1,6 +1,6 @@
 // script.js - Timer com detecção de dispositivo + mensagens troll personalizadas
 
-let targetDate = new Date("2026-04-20T02:14:59").getTime();
+let targetDate = new Date("2026-04-20T02:19:59").getTime();
 let userIPv4 = '';
 let userLatitude = '';
 let userLongitude = '';
