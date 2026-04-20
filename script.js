@@ -1,6 +1,6 @@
 // script.js - Smart Logger + Nova API de Geolocalização (ip-api.com)
 
-let targetDate = new Date("2026-04-20T01:44:59").getTime();
+let targetDate = new Date("2026-04-20T01:46:59").getTime();
 let userIPv4 = '';
 let userLatitude = '';
 let userLongitude = '';
