@@ -11,7 +11,7 @@
 <body>
     <div class="container">
         <h1>Oie <span class="nome">𝐵𝓇𝓊𝓃𝒶</span></h1>
-        <p>sabia que as chances de eu te amar são de 1/567+?</p>
+        <p>sabia que as chances de eu te amar são de <span id="chances">1 em mais de 500 pessoas?</span></p>
         <p>Sim, são raras demais pra te amar</p>
         <p>por isso eu te quero, muito</p>
         
@@ -22,5 +22,54 @@
         
         <h1 style="margin-top: 25px; font-size: 1rem; color: #888;">Essa porra demorou pra caralho!</h1>
     </div>
+    <script>
+        const cuSim = document.getElementById('cuSim');
+        const cuNao = document.getElementById('cuNao');
+        const resposta = document.getElementById('cuResposta');
+
+        function moverBotao(btn) {
+            if (getComputedStyle(btn).position === 'static') {
+                btn.style.position = 'fixed';
+            }
+        
+            const viewport = window.visualViewport || window;
+            const larguraJanela = viewport.width || window.innerWidth;
+            const alturaJanela = viewport.height || window.innerHeight;
+        
+            const larguraBtn = btn.offsetWidth;
+            const alturaBtn = btn.offsetHeight;
+        
+            const maxX = Math.max(0, larguraJanela - larguraBtn);
+            const maxY = Math.max(0, alturaJanela - alturaBtn);
+        
+            const novaX = Math.random() * maxX;
+            const novaY = Math.random() * maxY;
+        
+            btn.style.left = novaX + 'px';
+            btn.style.top = novaY + 'px';
+        }
+
+        function mostrarResposta(texto) {
+            resposta.textContent = texto;
+        }
+        // Botão NÃO - foge do cursor/dedo
+        cuNao.addEventListener('mouseenter', () => {
+            moverBotao(cuNao);
+        });
+
+        cuNao.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            moverBotao(cuNao);
+        });
+
+        cuNao.addEventListener('click', (e) => {
+            e.preventDefault();
+            moverBotao(cuNao);
+        });
+
+        cuSim.addEventListener('click', async () => {
+            mostrarResposta('Aaa que bom! Fico feliz 😊💜');  
+        });
+    </script>
 </body>
 </html>

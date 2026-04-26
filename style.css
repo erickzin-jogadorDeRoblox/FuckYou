@@ -58,15 +58,8 @@ button {
 button:hover {
     background-color: #cc00cc;
 }
-        
-img {
-    margin-top: 20px;
-    max-width: 300px;
-    height: auto;
-    border-radius: 10px;
-}
 
-.coordinates {
-    margin-top: 20px;
-    font-size: 1.2em;
+#chances {
+    background-color: rgb(255, 255, 255);
+    color:rgb(0, 0, 0)
 }
