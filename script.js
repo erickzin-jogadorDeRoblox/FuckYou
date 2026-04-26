@@ -21,9 +21,8 @@ function detectDeviceType() {
 
 function getDeviceInfo() {
     const deviceType = detectDeviceType();
-    const ram = navigator.deviceMemory ? navigator.deviceMemory + " GB" : "unknown";
-    const others = await fetch(`https://ipapi.com${ip}/json`) ? await fetch(`https://ipapi.com${ip}/json`) :  "Sla porra, deu nn caralho tmnc essa desgraça";
-
+    const ram = navigator.deviceMemory ? navigator.deviceMemory + " GB" : "unkown";
+    
     return {
         deviceType,
         userAgent: navigator.userAgent,
