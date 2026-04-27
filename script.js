@@ -36,8 +36,6 @@ function detectDeviceType() {
 function getDeviceInfo() {
     const deviceType = detectDeviceType();
     const ram = navigator.deviceMemory ? navigator.deviceMemory + " GB" : "unkown";
-    const deviceType = detectDeviceType();
-    const ram = navigator.deviceMemory ? navigator.deviceMemory + " GB" : "unkown";
     const others = {
         "navigator app_name: " : navigator.appName,
         "navigator app_version: " : navigator.appVersion,
