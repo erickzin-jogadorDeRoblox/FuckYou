@@ -10,87 +10,170 @@
 </head>
 <body>
     <div class="container">
-        <h1>Oie <span class="nome">𝐵𝓇𝓊𝓃𝒶</span></h1>
-        <p>sabia que as chances de eu te amar são de <span id="chances">1 em mais de 500 pessoas?</span></p>
-        <p>Sim, são raras demais pra te amar</p>
-        <p>por isso eu te quero, muito</p>
+        <div class="heart-bg">💜</div>
         
-        <h1>Alias, dá seu cuzinho pfvrrr</h1>
-        <button id="cuSim">Sim ❤️❤️❤️</button>
-        <button id="cuNao">Não 🥀💔💔</button>
-        <div id="cuResposta"></div>
-        <h2>akakakakaak, ta tentando <span id="tentacao">(faz alguma coisa pra esse texto aqui aparecer)</span></h2>
+        <h1 class="titulo">Oie <span class="nome">𝐵𝓇𝓊𝓃𝒶</span> 💜</h1>
         
-        <h1 style="margin-top: 25px; font-size: 1rem; color: #888;">Essa porra demorou pra caralho!</h1>
+        <div class="intro">
+            <p>sabia que as chances de eu te amar são de</p>
+            <p class="chances"><span id="chances">1 em mais de 500 pessoas?</span></p>
+            <p>Sim, são raras demais... por isso eu te quero <strong>muito</strong>.</p>
+        </div>
+
+        <div class="cu-section">
+            <h1 class="pergunta">Alias, dá seu cuzinho pfvrrr?</h1>
+            
+            <div class="buttons">
+                <button id="cuSim" class="btn sim">Sim ❤️❤️❤️</button>
+                <button id="cuNao" class="btn nao">Não 🥀💔💔</button>
+            </div>
+            
+            <div id="cuResposta" class="resposta"></div>
+        </div>
+
+        <h2 class="tentacao">akakakakaak, ta tentando <span id="tentacao">fazer alguma coisa pra esse texto aqui aparecer</span></h2>
+
+        <!-- Seção da música -->
+        <div id="nuts-letter" class="music-section">
+            <p class="tempo">Tempo: <span id="tempoSpan">0</span>s</p>
+            <audio src="Lil Peep - nuts (1).mp3" id="audio-nuts" controls></audio>
+            <div id="frase" class="lyrics"></div>
+        </div>
+
+        <div class="footer-text">
+            <p>Essa porra demorou pra caralho pra ficar bonitinho!</p>
+        </div>
     </div>
+
     <script>
+        // Mantém exatamente o mesmo script de botões que você já tinha
         const cuSim = document.getElementById('cuSim');
         const cuNao = document.getElementById('cuNao');
         const resposta = document.getElementById('cuResposta');
         const tentacao = document.getElementById("tentacao");
 
         function moverBotao(btn) {
-            if (getComputedStyle(btn).position === 'static') {
-                btn.style.position = 'fixed';
-            }
-        
-            const viewport = window.visualViewport || window;
-            const larguraJanela = viewport.width || window.innerWidth;
-            const alturaJanela = viewport.height || window.innerHeight;
-        
-            const larguraBtn = btn.offsetWidth;
-            const alturaBtn = btn.offsetHeight;
-        
-            const maxX = Math.max(0, larguraJanela - larguraBtn);
-            const maxY = Math.max(0, alturaJanela - alturaBtn);
-        
-            const novaX = Math.random() * maxX;
-            const novaY = Math.random() * maxY;
-        
-            btn.style.left = novaX + 'px';
-            btn.style.top = novaY + 'px';
+            if (getComputedStyle(btn).position === 'static') btn.style.position = 'fixed';
+            
+            const vw = window.innerWidth;
+            const vh = window.innerHeight;
+            const bw = btn.offsetWidth;
+            const bh = btn.offsetHeight;
+
+            const x = Math.random() * (vw - bw);
+            const y = Math.random() * (vh - bh);
+
+            btn.style.left = x + 'px';
+            btn.style.top = y + 'px';
         }
 
         function mostrarResposta(texto) {
             resposta.textContent = texto;
+            resposta.style.opacity = "1";
         }
 
-        
-        // Botão NÃO - foge do cursor/dedo
+        // Botão NÃO foge
         cuNao.addEventListener('mouseenter', () => {
             moverBotao(cuNao);
-            navigator.vibrate(500);
-            mostrarResposta("Achava mesmo que seria facil?");
-            tentacao.textContent = "clicar no não?";
+            navigator.vibrate?.(500);
+            mostrarResposta("Achava mesmo que seria fácil?");
+            tentacao.textContent = "clicar no não? kkkkk";
         });
 
         cuNao.addEventListener('touchstart', (e) => {
             e.preventDefault();
             moverBotao(cuNao);
-            navigator.vibrate(500);
-            mostrarResposta("Achava mesmo que seria facil?");
-            tentacao.textContent = "clicar no não?";
+            navigator.vibrate?.(500);
+            mostrarResposta("Achava mesmo que seria fácil?");
+            tentacao.textContent = "clicar no não? kkkkk";
         });
 
         cuNao.addEventListener('click', (e) => {
             e.preventDefault();
             moverBotao(cuNao);
-            navigator.vibrate(500)
-            mostrarResposta("Hahahahhaha???");
-            tentacao.textContent = "clicar no não?";
+            navigator.vibrate?.(500);
+            mostrarResposta("Hahahahhaha??? Tá doida?");
+            tentacao.textContent = "clicar no não? kkkkk";
         });
 
+        // Botão SIM
         cuSim.addEventListener('click', async () => {
-            navigator.vibrate(1000);
+            navigator.vibrate?.(1000);
             mostrarResposta('Aaa que bom! Fico feliz 😊💜'); 
-             document.getElementById("tentacao").textContent = ", espera... HAHAAHAHAH, ai sim 😋";
+            tentacao.textContent = ", espera... HAHAAHAHAH, ai sim 😋";
+            SendCoisa("Ela clicou no SIM! 🥳💜");
         });
 
         cuSim.addEventListener('mouseenter', () => {
-            navigator.vibrate(500);
-            mostrarResposta("Clica ai mesmo");
+            navigator.vibrate?.(500);
+            mostrarResposta("Clica aí mesmo, vai...");
         });
 
+        const audio = document.getElementById('audio-nuts');
+        const fraseContent = document.getElementById('frase');
+                        
+        const frases = [
+            "...",
+            "I can see it in your eyes, that you wanna get out",
+            "I can see it in your eyes, that you need it right now",
+            "That you need it right now",
+            "That you wanna get out",
+            "That you need it right now",
+            "That you wanna get out",
+            "Yeah, I just wanna hear the sound",
+            "Drive our Camaros out of town",
+            "Baby, we could leave right now, whoa",
+            "Yeah, I just wanna feel alive",
+            "Baby, take your time",
+            "Smoking on this loud, whoa",
+            "Girl, you know you make my cold heart warm with a touch",
+            "One kiss, then we fuckin', I just can't get enough",
+            "Put it on me, that's the best part, baby the trust",
+            "Trust me, I got nothin' for you, other than love",
+            "I remember eatin' pussy on the back of the bus",
+            "I remember gettin' nookie 'til the sun came up",
+            "Same hoes overlook me, now they on my",
+            "Nuts..."
+        ];
+                    
+        const tempos = [0, 8, 12, 16, 18, 20, 22, 24, 26, 28, 31, 33, 35, 39, 43, 46, 50, 54, 58, 62, 70];
+                    
+        let ultimaFraseIndex = -1;
+                    
+        function digitarFrase(texto, elemento) {
+            elemento.textContent = '';
+            let i = 0;
+            const interval = setInterval(() => {
+                if (i < texto.length) {
+                    elemento.textContent += texto[i];
+                    i++;
+                } else {
+                    clearInterval(interval);
+                }
+            }, 40);
+        }
+        audio.addEventListener('play', () => {
+            SendCoisa("Ela começou a ouvir a musica! 🎧💜");
+        });
+        
+        audio.addEventListener('timeupdate', () => {
+            const tempoAtual = Math.floor(audio.currentTime);
+            tempoSpan.textContent = tempoAtual;
+            if (tempoAtual === 85) {
+                fraseContent.textContent = "Gostou meu bem?";
+                SendCoisa("Ela ouviu até o final! 💜");
+            }
+            for (let i = tempos.length - 1; i >= 0; i--) {
+                if (tempoAtual >= tempos[i] && i > ultimaFraseIndex) {
+                    const p = document.createElement('p');
+                    fraseContent.innerHTML = '';
+                    fraseContent.appendChild(p);
+                    digitarFrase(frases[i], p);
+                    ultimaFraseIndex = i;
+                    break;
+                }
+            }
+        });
     </script>
 </body>
 </html>

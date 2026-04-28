@@ -3,63 +3,181 @@
     padding: 0;
     box-sizing: border-box;
 }
-        
+
 body {
-    background-color: black;
-    color: purple;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    background: linear-gradient(135deg, #0a001f, #1a0033, #2a004d);
+    color: #e0b3ff;
     min-height: 100vh;
-    font-family: Arial, sans-serif;
-}
-        
-.container {
-    text-align: center;
-    padding: 20px;
-}
-        
-h1 {
-    margin-bottom: 20px;
-    font-size: 2em;
-}
-        
-h2 {
-    margin-top: 20px;
-    margin-bottom: 20px;
-}
-        
-p {
-    margin: 10px 0;
-    font-size: 1.1em;
-}
-        
-audio {
-    display: block;
-    margin: 20px auto;
-}
-        
-.button-container {
-    margin: 20px 0;
-}
-        
-button {
-    background-color: purple;
-    color: black;
-    border: none;
-    padding: 10px 20px;
-    margin: 0 10px;
-    font-size: 1em;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: background-color 0.3s;
-}
-        
-button:hover {
-    background-color: #cc00cc;
+    font-family: 'Arial', sans-serif;
+    overflow-x: hidden;
+    position: relative;
 }
 
-#chances {
-    background-color: rgb(255, 255, 255);
-    color:rgb(0, 0, 0)
+.heart-bg {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    font-size: 6rem;
+    opacity: 0.08;
+    pointer-events: none;
+    z-index: 0;
+    animation: float 15s infinite ease-in-out;
+}
+
+.container {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 30px 20px;
+    text-align: center;
+}
+
+.titulo {
+    font-size: 3.2rem;
+    margin-bottom: 20px;
+    text-shadow: 0 0 20px rgba(200, 0, 255, 0.6);
+    animation: glow 2s infinite alternate;
+}
+
+.nome {
+    color: #ff00ff;
+    font-weight: bold;
+}
+
+.intro p {
+    font-size: 1.35rem;
+    margin: 15px 0;
+    line-height: 1.5;
+}
+
+.chances {
+    background: linear-gradient(90deg, #ff00ff, #aa00ff);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 50px;
+    display: inline-block;
+    font-weight: bold;
+    box-shadow: 0 0 25px rgba(255, 0, 255, 0.7);
+}
+
+.cu-section {
+    margin: 50px 0;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 20px;
+    border: 2px solid rgba(255, 0, 255, 0.3);
+}
+
+.pergunta {
+    font-size: 2.1rem;
+    margin-bottom: 25px;
+    color: #ff99ff;
+}
+
+.buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin: 25px 0;
+}
+
+.btn {
+    padding: 16px 32px;
+    font-size: 1.3rem;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: bold;
+    min-width: 180px;
+}
+
+.sim {
+    background: linear-gradient(45deg, #ff00aa, #aa00ff);
+    color: white;
+    box-shadow: 0 0 30px rgba(255, 0, 170, 0.6);
+}
+
+.sim:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 40px rgba(255, 0, 170, 0.9);
+}
+
+.nao {
+    background: linear-gradient(45deg, #660066, #990099);
+    color: #ff99ff;
+}
+
+.nao:hover {
+    background: #ff0066;
+    color: white;
+}
+
+.resposta {
+    margin-top: 20px;
+    font-size: 1.5rem;
+    min-height: 60px;
+    font-weight: bold;
+    opacity: 0;
+    transition: opacity 0.4s;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+}
+
+.tentacao {
+    margin: 40px 0 20px;
+    font-size: 1.4rem;
+    color: #cc88ff;
+}
+
+.music-section {
+    background: rgba(0, 0, 0, 0.4);
+    padding: 25px;
+    border-radius: 20px;
+    margin: 40px auto;
+    max-width: 700px;
+    border: 1px solid rgba(255, 0, 255, 0.2);
+}
+
+#tempoSpan {
+    color: #ff00ff;
+    font-weight: bold;
+}
+
+#frase {
+    margin-top: 20px;
+    min-height: 180px;
+    font-size: 1.25rem;
+    line-height: 1.7;
+    color: #f0c0ff;
+    text-align: left;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+}
+
+.footer-text {
+    margin-top: 60px;
+    font-size: 1rem;
+    color: #8855aa;
+    opacity: 0.8;
+}
+
+/* Animações */
+@keyframes glow {
+    from { text-shadow: 0 0 15px #ff00ff; }
+    to { text-shadow: 0 0 35px #ff00ff, 0 0 50px #aa00ff; }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-30px); }
+}
+
+/* Responsivo */
+@media (max-width: 600px) {
+    .titulo { font-size: 2.6rem; }
+    .buttons { flex-direction: column; align-items: center; }
+    .btn { min-width: 220px; }
 }
