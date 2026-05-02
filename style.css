@@ -53,7 +53,7 @@ body {
 
 .chances {
     background: linear-gradient(90deg, #ff00ff, #aa00ff);
-    color: white;
+    color: rgb(255, 0, 0);
     padding: 8px 20px;
     border-radius: 50px;
     display: inline-block;
