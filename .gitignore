@@ -25,6 +25,10 @@ Thumbs.db
 cartao-*.json
 resultados-*.json
 
+#codigos com tokens
+bruna/script.js
+bruna/config.js
+
 # Outros arquivos que você não quer subir
 *.pem
 *.key
