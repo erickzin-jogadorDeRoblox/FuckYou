@@ -1,0 +1,30 @@
+# .gitignore
+
+# Dependências
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Arquivo de ambiente (muito importante!)
+.env
+
+# Logs
+logs
+*.log
+
+# Pastas de build ou produção
+dist/
+build/
+
+# Arquivos temporários do sistema
+.DS_Store
+Thumbs.db
+
+# Arquivos gerados pelos testes (opcional)
+cartao-*.json
+resultados-*.json
+
+# Outros arquivos que você não quer subir
+*.pem
+*.key
